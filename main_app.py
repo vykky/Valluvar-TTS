@@ -17,7 +17,7 @@ import asyncio
 import edge_tts
 import tempfile
 import base64
-from streamlit_mic_recorder import speech_to_text  # 🔥 NEW: Voice Input Library
+from streamlit_mic_recorder import speech_to_text
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
@@ -111,7 +111,7 @@ def inject_custom_css_and_js():
             .bg-blobs::after { width: 500px; height: 500px; background: rgba(20,50,150,0.12); bottom: -150px; right: -100px; animation-delay: -3s; }
             @keyframes blobFloat { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(20px,-20px) scale(1.05); } }
             #modal-toggle { display: none; }
-            .about-btn { display: inline-block; cursor: pointer; color: #F0C96A !important; font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-top: 15px; padding: 6px 18px; border: 1px solid rgba(201,168,76,0.3); border-radius: 20px; background: rgba(255,255,255,0.05); transition: all 0.3s ease; }
+            .about-btn { display: inline-block; cursor: pointer; color: #F0C96A !important; font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-top: 15px; padding: 6px 18px; border: 1px solid rgba(201,168,76,0.3); border-radius: 20px; background: rgba(255,255,255,0.05); transition: all 0.3s ease; font-family: 'DM Sans', sans-serif; }
             .about-btn:hover { background: rgba(201,168,76,0.15); border-color: #F0C96A; box-shadow: 0 0 15px rgba(201,168,76,0.2); }
             .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,13,31,0.85); backdrop-filter: blur(8px); z-index: 99999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
             #modal-toggle:checked ~ .modal-overlay { opacity: 1; visibility: visible; }
@@ -330,7 +330,7 @@ def get_kural_from_local(kural_no, lang_mode):
     if lang_mode == "English":
         return {"line1": "'A' leads letters; the Ancient Lord Leads and lords the entire world", "line2": "", "meaning": "As the letter A is the first of all letters, so the eternal God is first in the world", "number": 1}
     else:
-        return {"line1": "அகர முதல எழுத்தெல்லாம் ஆதி", "line2": "பகவன் முதற்றே உலகு.", "meaning": "எழுத்துக்கள் எல்லாம் அகரத்தை அடிப்படையாக கொண்டிருக்கின்றன. அதுபோல உலகம் கடவுளை அடிப்படையாக கொண்டிருக்கிறது.", "number": 1}
+        return {"line1": "அகர முதல எழுத்தெல்லாம் ஆதி", "line2": "பகவன் முதற்றே உலகு.", "meaning": "எழுத்துக்கள் எல்லாம் அகரத்தை அடிப்படையாக கொண்டிருக்கின்றன. അത്போல உலகம் கடவுளை அடிப்படையாக கொண்டிருக்கிறது.", "number": 1}
 
 def simulate_traffic_control(lang):
     loading_container = st.empty()
@@ -406,22 +406,31 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
             if search_term: st.warning("No related Kural found. / தொடர்புடைய குறள் எதுவும் இல்லை.")
 
 # ==================================================
-# 2. VERDICT (Voice Input & Dynamic UI)
+# 2. VERDICT (BUG FIXED FOR VOICE LATCHING)
 # ==================================================
 elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI Verdict"]:
     
     st.markdown(f"<p style='color:#F0C96A; font-weight:bold; font-size:15px;'>{'🎤 உங்கள் குழப்பத்தை குரல் மூலம் கூறுக:' if lang == 'தமிழ்' else '🎤 Speak your situation:'}</p>", unsafe_allow_html=True)
     
-    # --- VOICE INPUT SECTION ---
-    col1, col2 = st.columns([1, 5])
+    col1, col2 = st.columns([1, 8])
     with col1:
-        spoken_verdict = speech_to_text(language='ta-IN' if lang == "தமிழ்" else 'en-US', use_container_width=True, just_once=True, key='STT_verdict')
-    
+        # 🔥 BUG FIX: Using just_once=True to prevent overwrite on next rerun, and emojis for a clean UI icon
+        spoken_verdict = speech_to_text(
+            start_prompt="🎙️", 
+            stop_prompt="🛑", 
+            language='ta-IN' if lang == "தமிழ்" else 'en-US', 
+            use_container_width=True, 
+            just_once=True, 
+            key='STT_verdict'
+        )
     with col2:
-        st.markdown("<p style='font-size:12px; color:gray;'><i>(மைக்கை கிளிக் செய்து பேசவும் / Click mic to speak)</i></p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:13px; color:gray; margin-top: 10px;'><i>(மைக் ஐகானை கிளிக் செய்து பேசவும்)</i></p>", unsafe_allow_html=True)
 
-    # --- TEXT INPUT (Auto-fills with Voice) ---
-    user_input = st.text_area("அல்லது இங்கே தட்டச்சு செய்யவும் / Or type here:", value=spoken_verdict if spoken_verdict else "", height=80)
+    # 🔥 BUG FIX: Store speech persistently in session state so it survives the Send button click
+    if spoken_verdict:
+        st.session_state["verdict_text_area"] = spoken_verdict
+
+    user_input = st.text_area("அல்லது இங்கே தட்டச்சு செய்யவும் / Or type here:", key="verdict_text_area", height=80)
     
     if st.button(btn_verdict):
         if not user_input: st.warning("Please type or speak your question.")
@@ -510,7 +519,7 @@ Format: {{"verdict": "சூழலுக்கான உங்களின் �
                     st.error(f"Error: {e}")
 
 # ==================================================
-# 3. AI MENTOR (Voice Input & Chat UI)
+# 3. AI MENTOR (BUG FIXED FOR VOICE LATCHING)
 # ==================================================
 elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
     init_msg = "உங்களால் தீர்க்க முடியாத மனப்போராட்டங்களைச் சொல்லுங்கள். அதற்கான அறிவுரை, தீர்வு மற்றும் செயல்படாவிடில் வரும் அபாயங்களை அறிந்துகொள்ளுங்கள்..." if lang == "தமிழ்" else "Greetings! I am AI Valluvar. Ask your questions to get wisdom from Thirukkural..."
@@ -518,7 +527,6 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
     if "messages" not in st.session_state:
         st.session_state.messages = [{"role": "assistant", "content": init_msg, "kural_data": None, "audio_html": ""}]
 
-    # Display Chat History with Audio Embedded
     for msg in st.session_state.messages:
         role = "assistant" if msg["role"] == "assistant" else "user"
         with st.chat_message(role):
@@ -557,19 +565,32 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
     st.markdown("---")
     st.markdown(f"<p style='color:#F0C96A; font-weight:bold; font-size:15px;'>{'🎤 வள்ளுவரிடம் குரல் மூலம் கேட்க:' if lang == 'தமிழ்' else '🎤 Speak to Valluvar:'}</p>", unsafe_allow_html=True)
     
-    col_m1, col_m2 = st.columns([1, 5])
+    col_m1, col_m2 = st.columns([1, 8])
     with col_m1:
-        spoken_mentor = speech_to_text(language='ta-IN' if lang == "தமிழ்" else 'en-US', use_container_width=True, just_once=True, key='STT_mentor')
+        # 🔥 BUG FIX: Using just_once=True and simple emoji icons
+        spoken_mentor = speech_to_text(
+            start_prompt="🎙️", 
+            stop_prompt="🛑", 
+            language='ta-IN' if lang == "தமிழ்" else 'en-US', 
+            use_container_width=True, 
+            just_once=True, 
+            key='STT_mentor'
+        )
     with col_m2:
-        st.markdown("<p style='font-size:12px; color:gray;'><i>(மைக்கை கிளிக் செய்து பேசவும் / Click mic to speak)</i></p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:13px; color:gray; margin-top: 10px;'><i>(மைக் ஐகானை கிளிக் செய்து பேசவும்)</i></p>", unsafe_allow_html=True)
 
-    # Replacing st.chat_input with st.text_area so voice text can auto-fill
-    prompt = st.text_area("கேள்வியை தட்டச்சு செய்யவும் / Type your question:", value=spoken_mentor if spoken_mentor else "", height=80)
+    # 🔥 BUG FIX: Store speech persistently in session state
+    if spoken_mentor:
+        st.session_state["mentor_text_area"] = spoken_mentor
+
+    prompt_val = st.text_area("கேள்வியை தட்டச்சு செய்யவும் / Type your question:", key="mentor_text_area", height=80)
 
     if st.button("அனுப்பு / Send", key="send_mentor_btn"):
-        if prompt:
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            st.rerun() # Forces rerun to show user message instantly like a real chat
+        if prompt_val:
+            st.session_state.messages.append({"role": "user", "content": prompt_val})
+            # Clear text box after sending successfully!
+            st.session_state["mentor_text_area"] = "" 
+            st.rerun()
 
     # Handle the backend logic if the last message was from the user
     if st.session_state.messages[-1]["role"] == "user":
