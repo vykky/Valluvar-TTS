@@ -371,10 +371,14 @@ elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI
                 try:
                     venba_class = "venba-eng" if lang == "English" else "venba-tamil"
                     
-                    # 🔥 STRICT GUARDRAILS & 100% PERCENTAGE FIX
+                # 🔥 DYNAMIC SITUATIONAL SCORING & THIRUKKURAL PHILOSOPHY GUARDRAIL
                     if lang == "English":
                         prompt = f"""Context: '{user_input}'. Act as Thiruvalluvar. Reply strictly in JSON. Is this a general question? 'yes' or 'no' in 'is_general'. If 'yes', provide 3 tags. 
-If 'no', score the situation for 'aram', 'porul', 'inbam'. CRITICAL: The sum of aram, porul, and inbam MUST EXACTLY equal 100. (e.g., 40, 40, 20).
+If 'no', score the user's intended ACTION independently out of 100 for:
+1. 'aram' (Ethics): How morally right is this action? (CRITICAL: 0% for murder, harm, stealing, cheating).
+2. 'porul' (Wealth): Practical benefit.
+3. 'inbam' (Joy): THIRUKKURAL RULE: True joy depends on virtue. If 'aram' is low, 'inbam' MUST be equally low.
+DO NOT force the sum to 100. Each is an independent score out of 100.
 CRITICAL GUARDRAILS:
 1. DO NOT invent Kurals. Use only real 'kural_number' (1-1330).
 2. 'adhigaaram' MUST exactly match the official chapter name for that Kural.
@@ -383,12 +387,16 @@ Format: {{"verdict": "Short advice", "is_general": "no", "aram": 0, "porul": 0, 
                         lbl_aram, lbl_porul, lbl_inbam = "⚖️ Virtue", "💰 Wealth", "❤️ Peace/Love"
                     else:
                         prompt = f"""சூழல்: '{user_input}'. நீ திருவள்ளுவர். பதில் JSON-ல் மட்டும். இது பொது கேள்வியா? 'is_general'-ல் 'yes' அல்லது 'no'. 'yes' என்றால் 3 tags. 
-'no' என்றால், இந்தச் செயலை 'aram', 'porul', 'inbam' என மதிப்பிடவும். மிக முக்கியம்: அறம், பொருள், இன்பம் ஆகிய மூன்றின் கூடுதல் (Sum) கண்டிப்பாக 100 ஆக மட்டுமே இருக்க வேண்டும் (எ.கா: 30, 50, 20).
+'no' என்றால், பயனர் செய்ய நினைக்கும் செயலை 0 முதல் 100 வரை தனித்தனியாக மதிப்பிடவும்:
+1. 'aram' (அறம்): இது எவ்வளவு தர்மமானது? (எச்சரிக்கை: கொலை, திருடு, வன்முறை போன்ற தீய செயல்களுக்கு 'aram' கண்டிப்பாக 0% ஆக இருக்க வேண்டும்).
+2. 'porul' (பொருள்): இதனால் வரும் பயன்.
+3. 'inbam' (இன்பம்): வள்ளுவர் விதியின்படி அறம் சார்ந்ததே இன்பம். எனவே 'aram' குறைந்தால் 'inbam' கண்டிப்பாக குறைய வேண்டும்.
+எச்சரிக்கை: மூன்றின் கூட்டுத்தொகை 100 ஆக இருக்க வேண்டிய அவசியமில்லை. ஒவ்வொன்றும் 100-க்கு தனித்தனி மதிப்பீடு.
 முக்கிய கட்டுப்பாடுகள் (CRITICAL GUARDRAILS):
 1. சொந்தமாக குறளை உருவாக்கக் கூடாது. 1 முதல் 1330 வரை உள்ள உண்மையான 'kural_number' மட்டுமே பயன்படுத்தவும்.
 2. 'adhigaaram' பெயர் தேர்ந்தெடுக்கப்பட்ட குறளுக்கு உரியதாக மட்டுமே இருக்க வேண்டும்.
-3. பணம், கடன் சார்ந்த கேள்விக்கு கண்டிப்பாக பொருட்பால் (எ.கா: வலியறிதல்) குறளைத் தரவும்.
-Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "porul": 0, "inbam": 0, "tag1": "", "tag2": "", "tag3": "", "kural_number": 479, "adhigaaram": "அதிகாரத்தின் பெயர்"}}"""
+3. பணம், கடன் சார்ந்த கேள்விக்கு கண்டிப்பாக பொருட்பால் குறளைத் தரவும்.
+Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "porul": 0, "inbam": 0, "tag1": "", "tag2": "", "tag3": "", "kural_number": 321, "adhigaaram": "அதிகாரத்தின் பெயர்"}}"""
                         lbl_aram, lbl_porul, lbl_inbam = "⚖️ அறம்", "💰 பொருள்", "❤️ அமைதி/இன்பம்"
 
                     response = model.generate_content(prompt)
