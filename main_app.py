@@ -454,21 +454,18 @@ Format: {{"verdict": "அறிவுரை", "aram": 40, "porul": 30, "inbam": 
                 except Exception as e:
                     send_error_alert(f"Verdict Generation Error: {e}")
                     st.error(f"Error: {e}")
-# ==================================================
-# 3. AI MENTOR (Untouched as requested)
-# ==================================================
+
 # ==================================================
 # 3. AI MENTOR 
 # ==================================================
 elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
     init_msg = "உங்களால் தீர்க்க முடியாத மனப்போராட்டங்களைச் சொல்லுங்கள். அதற்கான அறிவுரை, தீர்வு மற்றும் செயல்படாவிடில் வரும் அபாயங்களை அறிந்துகொள்ளுங்கள்..." if lang == "தமிழ்" else "Greetings! I am AI Valluvar. Ask your questions to get wisdom from Thirukkural..."
     
-# ... (உங்கள் பழைய கோடு: elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]: ...)
     if "messages" not in st.session_state:
         st.session_state.messages = [{"role": "assistant", "content": init_msg, "kural_data": None, "audio_html": ""}]
 
     # Display Chat History with Audio Embedded
-    for idx, msg in enumerate(st.session_state.messages):
+    for msg in st.session_state.messages:
         role = "assistant" if msg["role"] == "assistant" else "user"
         with st.chat_message(role):
             if role == "assistant" and "{" in msg["content"]:
@@ -512,20 +509,21 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
                     try:
                         venba_class = "venba-eng" if lang == "English" else "venba-tamil"
                         
-                        # 🔥 STRICT GUARDRAILS ADDED FOR MENTOR MODE
+                        # 🔥 TONE CORRECTION & BUG FIX ADDED
                         if lang == "English":
                             sys_msg = """Act as Thiruvalluvar. Reply strictly in JSON format.
 CRITICAL GUARDRAILS:
-1. DO NOT invent or hallucinate any Thirukkural. Only select a real, existing 'kural_number' between 1 and 1330.
-2. The 'adhigaaram' MUST exactly match the official Thirukkural chapter name for the chosen 'kural_number'. Do not mismatch them.
-3. For financial/debt queries, explicitly select kurals from 'Porutpal' (e.g., Chapter 48).
-Format: { "verdict": "Short practical advice", "solution": "Actionable, direct solution spoken from the perspective of Valluvar himself, without just explaining the Kural", "consequence": "Warning if ignored", "kural_number": 120, "adhigaaram": "Exact Chapter Name" }"""
+1. DO NOT invent or hallucinate any Thirukkural. Only select a real 'kural_number' between 1 and 1330.
+2. The 'adhigaaram' MUST exactly match the official Thirukkural chapter name.
+3. TONE: Speak like a wise mentor or a caring friend. Use simple, conversational, and practical English. Keep the length medium (2 to 3 sentences).
+Format: { "verdict": "Your actual short, direct advice for the situation", "solution": "Actionable, simple, conversational solution spoken from your perspective", "consequence": "A friendly but firm warning if ignored, in simple words", "kural_number": 120, "adhigaaram": "Exact Chapter Name" }"""
                         else:
                             sys_msg = """நீ திருவள்ளுவர். பதில் JSON வடிவில் மட்டும் தமிழில் இருக்க வேண்டும்.
 முக்கிய கட்டுப்பாடுகள் (CRITICAL GUARDRAILS):
-1. நீ எந்த காரணத்தைக் கொண்டும் சொந்தமாக திருக்குறளை உருவாக்கக் கூடாது. 1 முதல் 1330 வரை உள்ள உண்மையான குறள் எண்களை ('kural_number') மட்டுமே பயன்படுத்த வேண்டும்.
-2. நீ தேர்ந்தெடுக்கும் 'kural_number'-க்கு உரிய சரியான அதிகாரத்தின் பெயரை மட்டுமே 'adhigaaram'-ல் கொடுக்க வேண்டும் (எ.கா: கடன், பணம் என்றால் கண்டிப்பாக பொருட்பால் - வலியறிதல் போன்ற அதிகாரத்தில் உள்ள குறளைத் தேர்ந்தெடு).
-Format: { "verdict": "அறிவுரை", "solution": "திருக்குறளை விளக்காமல், வள்ளுவர் நேரில் சொல்வது போன்ற நேரடியான, நடைமுறை தீர்வு", "consequence": "எச்சரிக்கை", "kural_number": 120, "adhigaaram": "சரியான அதிகாரத்தின் பெயர்" }"""
+1. சொந்தமாக திருக்குறளை உருவாக்கக் கூடாது. 1 முதல் 1330 வரை உள்ள உண்மையான குறள் எண்களை ('kural_number') மட்டுமே பயன்படுத்த வேண்டும்.
+2. 'adhigaaram' சரியான அதிகாரத்தின் பெயராக இருக்க வேண்டும்.
+3. மொழிநடை (TONE): மிகவும் தூய தமிழில் இல்லாமல், ஒரு சக மனிதனிடம் / நண்பனிடம் இயல்பாகப் பேசுவது போல எளிய தமிழில் இருக்க வேண்டும். அளவு நடுத்தரமாக (2 அல்லது 3 வாக்கியங்கள்) இருக்க வேண்டும்.
+Format: { "verdict": "சூழலுக்கான உங்களின் சுருக்கமான, நேரடியான அறிவுரை", "solution": "திருக்குறளை விளக்காமல், நீங்களே நேரில் சொல்வது போன்ற எளிய, நடைமுறை தீர்வு", "consequence": "இதை பின்பற்றாவிட்டால் வரக்கூடிய விளைவுகள் பற்றிய எச்சரிக்கை (எளிய தமிழில்)", "kural_number": 120, "adhigaaram": "சரியான அதிகாரத்தின் பெயர்" }"""
                         
                         response = model.generate_content(sys_msg + "\n\nQuestion/கேள்வி: " + prompt)
                         r = extract_json_from_text(response.text)
@@ -580,7 +578,6 @@ Format: { "verdict": "அறிவுரை", "solution": "திருக்க
                     except Exception as e:
                         send_error_alert(f"AI Mentor Generation Error: {e}")
                         st.error(f"Error: {e}")
-
 # --- FOOTER ---
 st.markdown("""
 <div class="footer-nav">
