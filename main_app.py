@@ -48,11 +48,10 @@ def generate_edge_tts_audio(text_to_read, lang_code):
             audio_bytes = audio_file.read()
             
         b64 = base64.b64encode(audio_bytes).decode()
-        audio_html = f"""
-            <audio controls style="width: 100%; height: 40px; margin-top: 15px; border-radius: 8px; outline: none;">
-                <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
-            </audio>
-        """
+        
+        # 🔥 BUG FIX: Space இல்லாமல் ஒரே வரியாக கொடுக்க வேண்டும் (Markdown Code Block Issue-வை தவிர்க்க)
+        audio_html = f'<audio controls style="width: 100%; height: 40px; margin-top: 15px; border-radius: 8px; outline: none;"><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>'
+        
         os.remove(temp_audio_path) # Clean up
         return audio_html
     except Exception as e:
