@@ -142,7 +142,7 @@ st.markdown("""
 <p style="font-size: 13px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(201,168,76,0.8); margin-top: 12px; text-align: center;">திருக்குறள் மின்னுலகம்</p>
 
 <input type="checkbox" id="modal-toggle">
-<label for="modal-toggle" class="about-btn">ℹ️ About Software</label>
+<label for="modal-toggle" class="about-btn">&#8505; About Software</label>
 
 <div class="modal-overlay">
 <label for="modal-toggle" class="modal-bg-close"></label>
@@ -156,15 +156,15 @@ st.markdown("""
 </p>
 
 <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(201,168,76,0.2); border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: left;">
-<span style="color: #F0C96A !important; font-weight: bold; font-size: 14px;">✨ Key Features:</span><br>
-<span style="color: #E0E0E0 !important; font-size: 13px;">🌐 Dual Language Support (Tamil/Eng)</span><br>
-<span style="color: #E0E0E0 !important; font-size: 13px;">⚖️ Contextual Life Verdicts</span><br>
-<span style="color: #E0E0E0 !important; font-size: 13px;">🤖 Interactive AI Mentor</span><br>
-<span style="color: #E0E0E0 !important; font-size: 13px;">🎤 Voice Input Support</span>
+<span style="color: #F0C96A !important; font-weight: bold; font-size: 14px;">&#10024; Key Features:</span><br>
+<span style="color: #E0E0E0 !important; font-size: 13px;">&#127760; Dual Language Support (Tamil/Eng)</span><br>
+<span style="color: #E0E0E0 !important; font-size: 13px;">&#9878; Contextual Life Verdicts</span><br>
+<span style="color: #E0E0E0 !important; font-size: 13px;">&#129302; Interactive AI Mentor</span><br>
+<span style="color: #E0E0E0 !important; font-size: 13px;">&#127892; Voice Input Support</span>
 </div>
 
 <div style="background: rgba(255,100,100,0.1); border: 1px solid rgba(255,100,100,0.3); border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: left;">
-<span style="color: #FF8A80 !important; font-weight: bold; font-size: 14px;">📌 Important Note:</span><br>
+<span style="color: #FF8A80 !important; font-weight: bold; font-size: 14px;">&#128204; Important Note:</span><br>
 <p style="color: #E0E0E0 !important; font-size: 12.5px; line-height: 1.6; margin: 8px 0 0 0;">
 <b>1. Scroll to Read:</b> திருக்குறள் வரிகள் நீளமாக இருந்தால், பெட்டியை வலதுபுறம் Scroll / Swipe செய்து முழுமையாக வாசிக்கவும்.<br><br>
 <b>2. 100% Privacy:</b> உங்கள் பெயர், முகவரி, Phone Number, IP Address போன்ற எந்த தனிப்பட்ட தரவுகளும் எங்களால் சேகரிக்கப்படாது.
