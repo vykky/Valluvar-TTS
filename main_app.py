@@ -358,7 +358,7 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
             if search_term: st.warning("No related Kural found. / தொடர்புடைய குறள் எதுவும் இல்லை.")
 
 # ==================================================
-# 2. VERDICT (Dynamic UI: Situation -> %, General -> Tags)
+# 2. VERDICT (Dynamic UI: ALWAYS SHOW PERCENTAGES)
 # ==================================================
 elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI Verdict"]:
     user_input = st.text_input("உங்கள் குழப்பம் / Your Situation (e.g. கடன் வாங்கலாமா ? / Should I take a loan?):")
@@ -371,32 +371,31 @@ elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI
                 try:
                     venba_class = "venba-eng" if lang == "English" else "venba-tamil"
                     
-                # 🔥 DYNAMIC SITUATIONAL SCORING & THIRUKKURAL PHILOSOPHY GUARDRAIL
+                    # 🔥 STRICT GUARDRAILS & UNIVERSAL PERCENTAGE FIX (NO MORE TAGS)
                     if lang == "English":
-                        prompt = f"""Context: '{user_input}'. Act as Thiruvalluvar. Reply strictly in JSON. Is this a general question? 'yes' or 'no' in 'is_general'. If 'yes', provide 3 tags. 
-If 'no', score the user's intended ACTION independently out of 100 for:
-1. 'aram' (Ethics): How morally right is this action? (CRITICAL: 0% for murder, harm, stealing, cheating).
-2. 'porul' (Wealth): Practical benefit.
+                        prompt = f"""Context: '{user_input}'. Act as Thiruvalluvar. Reply strictly in JSON. 
+ALWAYS score the user's query or intended action independently out of 100 for:
+1. 'aram' (Ethics): How morally right is this? (CRITICAL: 0% for murder, harm, stealing).
+2. 'porul' (Wealth/Practicality): Practical benefit in life.
 3. 'inbam' (Joy): THIRUKKURAL RULE: True joy depends on virtue. If 'aram' is low, 'inbam' MUST be equally low.
-DO NOT force the sum to 100. Each is an independent score out of 100.
+Do not force the sum to 100. Provide scores for ALL queries, even general ones like "love" or "friendship". Do not use tags.
 CRITICAL GUARDRAILS:
 1. DO NOT invent Kurals. Use only real 'kural_number' (1-1330).
 2. 'adhigaaram' MUST exactly match the official chapter name for that Kural.
-3. For money/debt/business queries, MUST use 'Porutpal' kurals (e.g., Chapter 48).
-Format: {{"verdict": "Short advice", "is_general": "no", "aram": 0, "porul": 0, "inbam": 0, "tag1": "", "tag2": "", "tag3": "", "kural_number": 120, "adhigaaram": "Chapter Name"}}"""
+3. For money/debt/business queries, MUST use 'Porutpal' kurals.
+Format: {{"verdict": "Short advice", "aram": 0, "porul": 0, "inbam": 0, "kural_number": 120, "adhigaaram": "Chapter Name"}}"""
                         lbl_aram, lbl_porul, lbl_inbam = "⚖️ Virtue", "💰 Wealth", "❤️ Peace/Love"
                     else:
-                        prompt = f"""சூழல்: '{user_input}'. நீ திருவள்ளுவர். பதில் JSON-ல் மட்டும். இது பொது கேள்வியா? 'is_general'-ல் 'yes' அல்லது 'no'. 'yes' என்றால் 3 tags. 
-'no' என்றால், பயனர் செய்ய நினைக்கும் செயலை 0 முதல் 100 வரை தனித்தனியாக மதிப்பிடவும்:
-1. 'aram' (அறம்): இது எவ்வளவு தர்மமானது? (எச்சரிக்கை: கொலை, திருடு, வன்முறை போன்ற தீய செயல்களுக்கு 'aram' கண்டிப்பாக 0% ஆக இருக்க வேண்டும்).
-2. 'porul' (பொருள்): இதனால் வரும் பயன்.
-3. 'inbam' (இன்பம்): வள்ளுவர் விதியின்படி அறம் சார்ந்ததே இன்பம். எனவே 'aram' குறைந்தால் 'inbam' கண்டிப்பாக குறைய வேண்டும்.
-எச்சரிக்கை: மூன்றின் கூட்டுத்தொகை 100 ஆக இருக்க வேண்டிய அவசியமில்லை. ஒவ்வொன்றும் 100-க்கு தனித்தனி மதிப்பீடு.
+                        prompt = f"""சூழல்: '{user_input}'. நீ திருவள்ளுவர். பதில் JSON-ல் மட்டும்.
+பயனர் கேட்கும் கேள்வி அல்லது செயலை (அது காதல், நட்பு போன்ற பொதுவானதாக இருந்தாலும் சரி) கண்டிப்பாக 0 முதல் 100 வரை தனித்தனியாக மதிப்பிடவும்:
+1. 'aram' (அறம்): இது எவ்வளவு தர்மமானது? (எச்சரிக்கை: கொலை, திருடு போன்ற தீய செயல்களுக்கு 'aram' 0% ஆக இருக்க வேண்டும்).
+2. 'porul' (பொருள்): இதனால் வரும் நடைமுறை பயன்.
+3. 'inbam' (இன்பம்): வள்ளுவர் விதியின்படி அறம் குறைந்தால் இன்பமும் கண்டிப்பாக குறைய வேண்டும்.
+எச்சரிக்கை: மூன்றின் கூட்டுத்தொகை 100 ஆக இருக்க வேண்டியதில்லை. எந்த கேள்வியாக இருந்தாலும் கண்டிப்பாக மூன்று மதிப்பெண்களும் தரப்பட வேண்டும். 'Tags' வேண்டாம்.
 முக்கிய கட்டுப்பாடுகள் (CRITICAL GUARDRAILS):
 1. சொந்தமாக குறளை உருவாக்கக் கூடாது. 1 முதல் 1330 வரை உள்ள உண்மையான 'kural_number' மட்டுமே பயன்படுத்தவும்.
 2. 'adhigaaram' பெயர் தேர்ந்தெடுக்கப்பட்ட குறளுக்கு உரியதாக மட்டுமே இருக்க வேண்டும்.
-3. பணம், கடன் சார்ந்த கேள்விக்கு கண்டிப்பாக பொருட்பால் குறளைத் தரவும்.
-Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "porul": 0, "inbam": 0, "tag1": "", "tag2": "", "tag3": "", "kural_number": 321, "adhigaaram": "அதிகாரத்தின் பெயர்"}}"""
+Format: {{"verdict": "அறிவுரை", "aram": 0, "porul": 0, "inbam": 0, "kural_number": 1100, "adhigaaram": "அதிகாரத்தின் பெயர்"}}"""
                         lbl_aram, lbl_porul, lbl_inbam = "⚖️ அறம்", "💰 பொருள்", "❤️ அமைதி/இன்பம்"
 
                     response = model.generate_content(prompt)
@@ -408,7 +407,6 @@ Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "po
                         kural_line2_html = f'<div class="kural-line2">{local_data["line2"]}</div>' if local_data["line2"] else ''
                         ai_chap = res.get('adhigaaram', 'அதிகாரம்')
                         
-                        is_gen = str(res.get('is_general', 'no')).strip().lower() == 'yes'
                         dynamic_ui_html = ""
                         
                         # --- AUDIO SCRIPT GENERATION ---
@@ -418,24 +416,16 @@ Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "po
                         else:
                             audio_text = f"Advice: {verdict_text}. "
                             
-                        if is_gen:
-                            t1, t2, t3 = str(res.get('tag1', '')).strip(), str(res.get('tag2', '')).strip(), str(res.get('tag3', '')).strip()
-                            dynamic_ui_html = f"""<div class="percentage-container">
-<span class="percentage-item" style="color:#A5D6A7 !important;">🏷️ {t1}</span>
-<span class="percentage-item" style="color:#F0C96A !important;">🏷️ {t2}</span>
-<span class="percentage-item" style="color:#FF8A80 !important;">🏷️ {t3}</span>
-</div>"""
-                        else:
-                            arm, prl, inb = int(res.get('aram', 33)), int(res.get('porul', 33)), int(res.get('inbam', 34))
-                            dynamic_ui_html = f"""<div class="percentage-container">
+                        arm, prl, inb = int(res.get('aram', 33)), int(res.get('porul', 33)), int(res.get('inbam', 34))
+                        dynamic_ui_html = f"""<div class="percentage-container">
 <span class="percentage-item" style="color:#A5D6A7 !important;">{lbl_aram}: {arm}%</span>
 <span class="percentage-item" style="color:#F0C96A !important;">{lbl_porul}: {prl}%</span>
 <span class="percentage-item" style="color:#FF8A80 !important;">{lbl_inbam}: {inb}%</span>
 </div>"""
-                            if lang == "தமிழ்":
-                                audio_text += f" இதில், அறம் {arm} சதவிகிதம், பொருள் {prl} சதவிகிதம், இன்பம் {inb} சதவிகிதம் உள்ளது."
-                            else:
-                                audio_text += f" In this, Virtue is {arm} percent, Wealth is {prl} percent, and Joy is {inb} percent."
+                        if lang == "தமிழ்":
+                            audio_text += f" இதில், அறம் {arm} சதவிகிதம், பொருள் {prl} சதவிகிதம், இன்பம் {inb} சதவிகிதம் உள்ளது."
+                        else:
+                            audio_text += f" In this, Virtue is {arm} percent, Wealth is {prl} percent, and Joy is {inb} percent."
                         
                         # Generate Audio with Unique ID based on timestamp to avoid caching old audio
                         unique_id = f"audio_verdict_{int(time.time())}"
