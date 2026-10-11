@@ -147,7 +147,8 @@ st.markdown("""
 <div class="modal-overlay">
 <label for="modal-toggle" class="modal-bg-close"></label>
 <div class="modal-box">
-<label for="modal-toggle" class="close-btn">✖</label>
+<!-- பிழை திருத்தப்பட்ட இடம்: '✖' குறியீட்டிற்குப் பதிலாக '&times;' பயன்படுத்தப்பட்டுள்ளது -->
+<label for="modal-toggle" class="close-btn">&times;</label>
 <h3 style="color: #F0C96A !important; font-size: 22px; font-family: 'Cinzel', serif; margin-top:0; margin-bottom: 15px;">VALLUVAR 2.0</h3>
 
 <p style="color: #FFFFFF !important; font-size: 14px; line-height: 1.6; margin-bottom: 15px; text-align: center;">
