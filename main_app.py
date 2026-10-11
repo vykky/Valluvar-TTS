@@ -614,6 +614,6 @@ Format: { "verdict": "சூழலுக்கான உங்களின் �
 # --- FOOTER ---
 st.markdown("""
 <div class="footer-nav">
-<p>© All rights reserved by <strong style="color:#C9A84C !important;">MIN E KAVI (மின்கவி)</strong> &nbsp;|&nbsp; Idealogy & Developed by <strong style="color:#C9A84C !important;">VIGNESH M</strong></p>
+<p>&copy; All rights reserved by <strong style="color:#C9A84C !important;">MIN E KAVI (மின்கவி)</strong> &nbsp;|&nbsp; Idealogy & Developed by <strong style="color:#C9A84C !important;">VIGNESH M</strong></p>
 </div>
 """, unsafe_allow_html=True)
