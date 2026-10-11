@@ -7,3 +7,4 @@ gTTS
 audio-recorder-streamlit
 requests
 edge-tts
+streamlit-mic-recorder
