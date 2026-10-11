@@ -1,5 +1,9 @@
 streamlit
-google-generativeai
+google-generativeai>=0.7.2
 gspread
 google-auth
-gtts
+SpeechRecognition
+gTTS
+audio-recorder-streamlit
+requests
+edge-tts
