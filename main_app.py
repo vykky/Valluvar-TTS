@@ -27,16 +27,14 @@ st.set_page_config(
 )
 
 # ==========================================
-# 🔊 MICROSOFT EDGE TTS (VALLUVAR NEURAL VOICE)
+# 🔊 MICROSOFT EDGE TTS (VALLUVAR NEURAL VOICE) - BUG FIXED
 # ==========================================
 def generate_edge_tts_audio(text_to_read, lang_code):
     try:
-        # மைக்ரோசாப்ட்டின் அதிகாரப்பூர்வ தமிழ் ஆண் குரல் 'Valluvar'
         voice = 'ta-IN-ValluvarNeural' if lang_code == "தமிழ்" else 'en-US-ChristopherNeural'
         
         async def amain():
             communicate = edge_tts.Communicate(text_to_read, voice)
-            # மெய்நிகர் ஃபைலாக மாற்றி அதை Streamlit-ல் கொடுக்கிறோம்
             with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
                 temp_path = fp.name
             await communicate.save(temp_path)
@@ -49,21 +47,21 @@ def generate_edge_tts_audio(text_to_read, lang_code):
             
         b64 = base64.b64encode(audio_bytes).decode()
         
-        # 🔥 BUG FIX: Space இல்லாமல் ஒரே வரியாக கொடுக்க வேண்டும் (Markdown Code Block Issue-வை தவிர்க்க)
+        # 🔥 BUG FIX: No indentation or newlines inside the HTML string to prevent Markdown rendering issues
         audio_html = f'<audio controls style="width: 100%; height: 40px; margin-top: 15px; border-radius: 8px; outline: none;"><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>'
         
-        os.remove(temp_audio_path) # Clean up
+        os.remove(temp_audio_path)
         return audio_html
     except Exception as e:
-        return f"<p style='color:#FF8A80; font-size:12px;'>Audio generation skipped: {e}</p>"
-
+        return f"<p style='color:#FF8A80; font-size:12px;'>Audio generation error: {e}</p>"
 
 # ==========================================
 # 💾 DATA LOGGING SYSTEM (GOOGLE SHEETS)
 # ==========================================
 def log_to_gsheets(mode, query, response):
     try:
-        if "gcp_service_account" not in st.secrets: return
+        if "gcp_service_account" not in st.secrets:
+            return
         scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
         creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scopes)
         client = gspread.authorize(creds)
@@ -368,23 +366,25 @@ elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI
             with st.spinner("📜 Analyzing your situation..."):
                 try:
                     venba_class = "venba-eng" if lang == "English" else "venba-tamil"
+                    
+                    # 🔥 STRICT GUARDRAILS ADDED FOR VERDICT MODE
                     if lang == "English":
                         prompt = f"""Context: '{user_input}'. Act as Thiruvalluvar. Reply strictly in JSON. Is this a general question? 'yes' or 'no' in 'is_general'. If 'yes', provide 3 tags. 
-If 'no', score the situation from 0 to 100 independently for:
-1. 'aram' (Ethics): Is it morally right and harmless? (CRITICAL: Suicide, self-harm, murder, cheating MUST be 0).
-2. 'porul' (Practicality/Wealth): Does it build career or practical life?
-3. 'inbam' (Joy/Love): Does it bring true peace or relationship harmony?
-IMPORTANT: Provide a valid 'kural_number' (1-1330) and EXACT official 'adhigaaram' (Chapter Name). 
+CRITICAL GUARDRAILS:
+1. DO NOT invent or hallucinate any Thirukkural. Only select a real, existing 'kural_number' between 1 and 1330.
+2. If the context is about money, debt, business, or practical life, you MUST select a Kural strictly from 'Porutpal' (e.g., Chapter: Valiyarithal - 48).
+3. The 'adhigaaram' value MUST EXACTLY match the official Thirukkural chapter name for the chosen 'kural_number'. Do not mismatch them.
+4. Score the situation (0 to 100) for 'aram', 'porul', 'inbam' independently.
 Format: {{"verdict": "Short advice", "is_general": "no", "aram": 0, "porul": 0, "inbam": 0, "tag1": "", "tag2": "", "tag3": "", "kural_number": 120, "adhigaaram": "Chapter Name"}}"""
                         lbl_aram, lbl_porul, lbl_inbam = "⚖️ Virtue", "💰 Wealth", "❤️ Peace/Love"
                     else:
                         prompt = f"""சூழல்: '{user_input}'. நீ திருவள்ளுவர். பதில் JSON-ல் மட்டும். இது பொது கேள்வியா? 'is_general'-ல் 'yes' அல்லது 'no'. 'yes' என்றால் 3 tags. 
-'no' என்றால், இந்தச் செயலை 0 முதல் 100 வரை தனித்தனியாக மதிப்பிடவும்:
-1. 'aram' (அறம்): இது தர்மமா? யாருக்கும் தீங்கு விளைவிக்காததா? (எச்சரிக்கை: தற்கொலை, கொலை, ஏமாற்றுதல் போன்ற தீய செயல்களுக்கு அறம் கண்டிப்பாக 0 ஆக இருக்க வேண்டும்).
-2. 'porul' (பொருள்): இது வாழ்க்கைக்கு அல்லது பொருளாதாரத்திற்கு உதவுமா?
-3. 'inbam' (இன்பம்): இது மனதிற்கு உண்மையான அமைதியையோ அன்பையோ தருமா?
-உண்மையான 'kural_number' (1-1330) மற்றும் சரியான 'adhigaaram' தரவும். 
-Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "porul": 0, "inbam": 0, "tag1": "", "tag2": "", "tag3": "", "kural_number": 120, "adhigaaram": "அதிகாரத்தின் பெயர்"}}"""
+முக்கிய கட்டுப்பாடுகள் (CRITICAL GUARDRAILS):
+1. நீ எந்த காரணத்தைக் கொண்டும் சொந்தமாக திருக்குறளை உருவாக்கக் கூடாது. 1 முதல் 1330 வரை உள்ள உண்மையான திருக்குறள் எண்களை ('kural_number') மட்டுமே பயன்படுத்த வேண்டும்.
+2. பணம், கடன், தொழில் போன்ற சூழலாக இருந்தால் கண்டிப்பாக 'பொருட்பால்' (எ.கா: வலியறிதல் அதிகாரம் - குறள் 478, 479) பகுதியில் இருந்து மட்டுமே குறளைத் தேர்ந்தெடுக்க வேண்டும்.
+3. நீ தேர்ந்தெடுக்கும் 'kural_number'-க்கு உரிய சரியான அதிகாரத்தின் பெயரை மட்டுமே 'adhigaaram'-ல் கொடுக்க வேண்டும். மாற்றி கொடுக்கக் கூடாது.
+4. இந்தச் செயலை 0 முதல் 100 வரை தனித்தனியாக மதிப்பிடவும் ('aram', 'porul', 'inbam').
+Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "porul": 0, "inbam": 0, "tag1": "", "tag2": "", "tag3": "", "kural_number": 479, "adhigaaram": "அதிகாரத்தின் பெயர்"}}"""
                         lbl_aram, lbl_porul, lbl_inbam = "⚖️ அறம்", "💰 பொருள்", "❤️ அமைதி/இன்பம்"
 
                     response = model.generate_content(prompt)
@@ -424,7 +424,7 @@ Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "po
                             else:
                                 audio_text += f" In this, Virtue is {arm} percent, Wealth is {prl} percent, and Joy is {inb} percent."
                         
-                        # Generate Edge TTS Audio HTML element instantly (No Streamlit Button needed!)
+                        # Generate Edge TTS Audio HTML element instantly
                         audio_player_html = generate_edge_tts_audio(audio_text, lang)
                         
                         st.markdown(f"""
@@ -501,11 +501,20 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
                     try:
                         venba_class = "venba-eng" if lang == "English" else "venba-tamil"
                         
-                        # 🔥 STRICT PROMPT FIX: Valluvar gives a direct solution, NOT an explanation
+                        # 🔥 STRICT GUARDRAILS ADDED FOR MENTOR MODE
                         if lang == "English":
-                            sys_msg = "Act as Thiruvalluvar. Reply strictly in JSON format. Provide the most apt kural number and its Chapter Name. Format: { \"verdict\": \"Short practical advice\", \"solution\": \"Actionable, direct solution spoken from the perspective of Valluvar himself, without just explaining the Kural\", \"consequence\": \"Warning if ignored\", \"kural_number\": 120, \"adhigaaram\": \"Chapter Name\" }"
+                            sys_msg = """Act as Thiruvalluvar. Reply strictly in JSON format.
+CRITICAL GUARDRAILS:
+1. DO NOT invent or hallucinate any Thirukkural. Only select a real, existing 'kural_number' between 1 and 1330.
+2. The 'adhigaaram' MUST exactly match the official Thirukkural chapter name for the chosen 'kural_number'. Do not mismatch them.
+3. For financial/debt queries, explicitly select kurals from 'Porutpal' (e.g., Chapter 48).
+Format: { "verdict": "Short practical advice", "solution": "Actionable, direct solution spoken from the perspective of Valluvar himself, without just explaining the Kural", "consequence": "Warning if ignored", "kural_number": 120, "adhigaaram": "Exact Chapter Name" }"""
                         else:
-                            sys_msg = "நீ திருவள்ளுவர். பதில் JSON வடிவில் மட்டும் தமிழில் இருக்க வேண்டும். இந்த சூழலுக்கு ஏற்ற சரியான திருக்குறள் எண் மற்றும் அதிகாரத்தின் பெயர் தரவும். Format: { \"verdict\": \"அறிவுரை\", \"solution\": \"திருக்குறளை விளக்காமல், வள்ளுவர் நேரில் சொல்வது போன்ற நேரடியான, நடைமுறை தீர்வு\", \"consequence\": \"எச்சரிக்கை\", \"kural_number\": 120, \"adhigaaram\": \"அதிகாரத்தின் பெயர்\" }"
+                            sys_msg = """நீ திருவள்ளுவர். பதில் JSON வடிவில் மட்டும் தமிழில் இருக்க வேண்டும்.
+முக்கிய கட்டுப்பாடுகள் (CRITICAL GUARDRAILS):
+1. நீ எந்த காரணத்தைக் கொண்டும் சொந்தமாக திருக்குறளை உருவாக்கக் கூடாது. 1 முதல் 1330 வரை உள்ள உண்மையான குறள் எண்களை ('kural_number') மட்டுமே பயன்படுத்த வேண்டும்.
+2. நீ தேர்ந்தெடுக்கும் 'kural_number'-க்கு உரிய சரியான அதிகாரத்தின் பெயரை மட்டுமே 'adhigaaram'-ல் கொடுக்க வேண்டும் (எ.கா: கடன், பணம் என்றால் கண்டிப்பாக பொருட்பால் - வலியறிதல் போன்ற அதிகாரத்தில் உள்ள குறளைத் தேர்ந்தெடு).
+Format: { "verdict": "அறிவுரை", "solution": "திருக்குறளை விளக்காமல், வள்ளுவர் நேரில் சொல்வது போன்ற நேரடியான, நடைமுறை தீர்வு", "consequence": "எச்சரிக்கை", "kural_number": 120, "adhigaaram": "சரியான அதிகாரத்தின் பெயர்" }"""
                         
                         response = model.generate_content(sys_msg + "\n\nQuestion/கேள்வி: " + prompt)
                         r = extract_json_from_text(response.text)
@@ -530,7 +539,7 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
                                 audio_text += f"Solution: {r.get('solution', '')}. "
                                 audio_text += f"Warning: {r.get('consequence', '')}."
 
-                            # Generate and embed audio instantly (Bypassing streamlite state issues)
+                            # Generate and embed audio instantly
                             audio_player_html = generate_edge_tts_audio(audio_text, lang)
 
                             st.markdown(f"""
