@@ -147,13 +147,12 @@ st.markdown("""
 <div class="modal-overlay">
 <label for="modal-toggle" class="modal-bg-close"></label>
 <div class="modal-box">
-<!-- பிழை திருத்தப்பட்ட இடம்: '✖' குறியீட்டிற்குப் பதிலாக '&times;' பயன்படுத்தப்பட்டுள்ளது -->
 <label for="modal-toggle" class="close-btn">&times;</label>
 <h3 style="color: #F0C96A !important; font-size: 22px; font-family: 'Cinzel', serif; margin-top:0; margin-bottom: 15px;">VALLUVAR 2.0</h3>
 
 <p style="color: #FFFFFF !important; font-size: 14px; line-height: 1.6; margin-bottom: 15px; text-align: center;">
 வாழ்க்கையில் பிரச்சனைகளா? உங்கள் அனைத்து உளவியல் போராட்டங்களுக்கும் வள்ளுவரின் 1330 குறள்கள் வழியே தீர்வு காண்போம்.<br><br>
-<i style="color: rgba(255,255,255,0.8); font-size: 13.5px;">Facing life's challenges? Find solutions to all your emotional and psychological struggles through the wisdom of 1330 Thirukkurals.</i>
+<i style="color: rgba(255,255,255,0.8); font-size: 13.5px;">Facing life&#39;s challenges? Find solutions to all your emotional and psychological struggles through the wisdom of 1330 Thirukkurals.</i>
 </p>
 
 <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(201,168,76,0.2); border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: left;">
