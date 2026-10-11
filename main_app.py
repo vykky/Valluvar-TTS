@@ -1,4 +1,8 @@
 import streamlit as st
+import asyncio
+import edge_tts
+import tempfile
+import base64
 import textwrap
 import json
 import os
@@ -27,9 +31,9 @@ st.set_page_config(
 )
 
 # ==========================================
-# 🔊 MICROSOFT EDGE TTS (VALLUVAR NEURAL VOICE) - BUG FIXED
+# 🔊 MICROSOFT EDGE TTS (VALLUVAR NEURAL VOICE)
 # ==========================================
-def generate_edge_tts_audio(text_to_read, lang_code):
+def generate_edge_tts_audio(text_to_read, lang_code, unique_id):
     try:
         voice = 'ta-IN-ValluvarNeural' if lang_code == "தமிழ்" else 'en-US-ChristopherNeural'
         
@@ -47,8 +51,8 @@ def generate_edge_tts_audio(text_to_read, lang_code):
             
         b64 = base64.b64encode(audio_bytes).decode()
         
-        # 🔥 BUG FIX: No indentation or newlines inside the HTML string to prevent Markdown rendering issues
-        audio_html = f'<audio controls style="width: 100%; height: 40px; margin-top: 15px; border-radius: 8px; outline: none;"><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>'
+        # Unique ID-ஐ HTML-ல் சேர்ப்பதன் மூலம் பழைய ஆடியோ ப்ளே ஆவது தடுக்கப்படும்.
+        audio_html = f'<audio id="{unique_id}" controls style="width: 100%; height: 40px; margin-top: 15px; border-radius: 8px; outline: none;"><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>'
         
         os.remove(temp_audio_path)
         return audio_html
@@ -364,26 +368,27 @@ elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI
         else:
             simulate_traffic_control(lang)
             with st.spinner("📜 Analyzing your situation..."):
+              # ... (உங்கள் பழைய கோடு: elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI Verdict"]: ...)
                 try:
                     venba_class = "venba-eng" if lang == "English" else "venba-tamil"
                     
-                    # 🔥 STRICT GUARDRAILS ADDED FOR VERDICT MODE
+                    # 🔥 STRICT GUARDRAILS & 100% PERCENTAGE FIX
                     if lang == "English":
                         prompt = f"""Context: '{user_input}'. Act as Thiruvalluvar. Reply strictly in JSON. Is this a general question? 'yes' or 'no' in 'is_general'. If 'yes', provide 3 tags. 
+If 'no', score the situation for 'aram', 'porul', 'inbam'. CRITICAL: The sum of aram, porul, and inbam MUST EXACTLY equal 100. (e.g., 40, 40, 20).
 CRITICAL GUARDRAILS:
-1. DO NOT invent or hallucinate any Thirukkural. Only select a real, existing 'kural_number' between 1 and 1330.
-2. If the context is about money, debt, business, or practical life, you MUST select a Kural strictly from 'Porutpal' (e.g., Chapter: Valiyarithal - 48).
-3. The 'adhigaaram' value MUST EXACTLY match the official Thirukkural chapter name for the chosen 'kural_number'. Do not mismatch them.
-4. Score the situation (0 to 100) for 'aram', 'porul', 'inbam' independently.
+1. DO NOT invent Kurals. Use only real 'kural_number' (1-1330).
+2. 'adhigaaram' MUST exactly match the official chapter name for that Kural.
+3. For money/debt/business queries, MUST use 'Porutpal' kurals (e.g., Chapter 48).
 Format: {{"verdict": "Short advice", "is_general": "no", "aram": 0, "porul": 0, "inbam": 0, "tag1": "", "tag2": "", "tag3": "", "kural_number": 120, "adhigaaram": "Chapter Name"}}"""
                         lbl_aram, lbl_porul, lbl_inbam = "⚖️ Virtue", "💰 Wealth", "❤️ Peace/Love"
                     else:
                         prompt = f"""சூழல்: '{user_input}'. நீ திருவள்ளுவர். பதில் JSON-ல் மட்டும். இது பொது கேள்வியா? 'is_general'-ல் 'yes' அல்லது 'no'. 'yes' என்றால் 3 tags. 
+'no' என்றால், இந்தச் செயலை 'aram', 'porul', 'inbam' என மதிப்பிடவும். மிக முக்கியம்: அறம், பொருள், இன்பம் ஆகிய மூன்றின் கூடுதல் (Sum) கண்டிப்பாக 100 ஆக மட்டுமே இருக்க வேண்டும் (எ.கா: 30, 50, 20).
 முக்கிய கட்டுப்பாடுகள் (CRITICAL GUARDRAILS):
-1. நீ எந்த காரணத்தைக் கொண்டும் சொந்தமாக திருக்குறளை உருவாக்கக் கூடாது. 1 முதல் 1330 வரை உள்ள உண்மையான திருக்குறள் எண்களை ('kural_number') மட்டுமே பயன்படுத்த வேண்டும்.
-2. பணம், கடன், தொழில் போன்ற சூழலாக இருந்தால் கண்டிப்பாக 'பொருட்பால்' (எ.கா: வலியறிதல் அதிகாரம் - குறள் 478, 479) பகுதியில் இருந்து மட்டுமே குறளைத் தேர்ந்தெடுக்க வேண்டும்.
-3. நீ தேர்ந்தெடுக்கும் 'kural_number'-க்கு உரிய சரியான அதிகாரத்தின் பெயரை மட்டுமே 'adhigaaram'-ல் கொடுக்க வேண்டும். மாற்றி கொடுக்கக் கூடாது.
-4. இந்தச் செயலை 0 முதல் 100 வரை தனித்தனியாக மதிப்பிடவும் ('aram', 'porul', 'inbam').
+1. சொந்தமாக குறளை உருவாக்கக் கூடாது. 1 முதல் 1330 வரை உள்ள உண்மையான 'kural_number' மட்டுமே பயன்படுத்தவும்.
+2. 'adhigaaram' பெயர் தேர்ந்தெடுக்கப்பட்ட குறளுக்கு உரியதாக மட்டுமே இருக்க வேண்டும்.
+3. பணம், கடன் சார்ந்த கேள்விக்கு கண்டிப்பாக பொருட்பால் (எ.கா: வலியறிதல்) குறளைத் தரவும்.
 Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "porul": 0, "inbam": 0, "tag1": "", "tag2": "", "tag3": "", "kural_number": 479, "adhigaaram": "அதிகாரத்தின் பெயர்"}}"""
                         lbl_aram, lbl_porul, lbl_inbam = "⚖️ அறம்", "💰 பொருள்", "❤️ அமைதி/இன்பம்"
 
@@ -395,6 +400,7 @@ Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "po
                         local_data = get_kural_from_local(res.get('kural_number', 1), lang)
                         kural_line2_html = f'<div class="kural-line2">{local_data["line2"]}</div>' if local_data["line2"] else ''
                         ai_chap = res.get('adhigaaram', 'அதிகாரம்')
+                        
                         is_gen = str(res.get('is_general', 'no')).strip().lower() == 'yes'
                         dynamic_ui_html = ""
                         
@@ -413,7 +419,7 @@ Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "po
 <span class="percentage-item" style="color:#FF8A80 !important;">🏷️ {t3}</span>
 </div>"""
                         else:
-                            arm, prl, inb = res.get('aram', 33), res.get('porul', 33), res.get('inbam', 34)
+                            arm, prl, inb = int(res.get('aram', 33)), int(res.get('porul', 33)), int(res.get('inbam', 34))
                             dynamic_ui_html = f"""<div class="percentage-container">
 <span class="percentage-item" style="color:#A5D6A7 !important;">{lbl_aram}: {arm}%</span>
 <span class="percentage-item" style="color:#F0C96A !important;">{lbl_porul}: {prl}%</span>
@@ -424,8 +430,9 @@ Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "po
                             else:
                                 audio_text += f" In this, Virtue is {arm} percent, Wealth is {prl} percent, and Joy is {inb} percent."
                         
-                        # Generate Edge TTS Audio HTML element instantly
-                        audio_player_html = generate_edge_tts_audio(audio_text, lang)
+                        # Generate Audio with Unique ID based on timestamp to avoid caching old audio
+                        unique_id = f"audio_verdict_{int(time.time())}"
+                        audio_player_html = generate_edge_tts_audio(audio_text, lang, unique_id)
                         
                         st.markdown(f"""
 <div class="result-card card-advice">
@@ -442,22 +449,24 @@ Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "po
 <div class="kural-meaning"><strong>{lbl_exp}</strong><br>{local_data['meaning']}</div>
 </div>
 """, unsafe_allow_html=True)
-                    else: st.error("AI Output Error.")
-                except Exception as e:
-                    send_error_alert(f"Verdict Generation Error: {e}")
-                    st.error(f"Error: {e}")
-
+                        
+                        # 🔥 BUG FIX: Reset Streamlit state input values manually using HTML tricks if needed, 
+                        # or let Streamlit handle it natively since we are not using st.form.
+                    else:
+                        st.error("AI Output Error.")
+# ... (உங்கள் பழைய கோடு தொடரும்)
 # ==================================================
 # 3. AI MENTOR 
 # ==================================================
 elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
     init_msg = "உங்களால் தீர்க்க முடியாத மனப்போராட்டங்களைச் சொல்லுங்கள். அதற்கான அறிவுரை, தீர்வு மற்றும் செயல்படாவிடில் வரும் அபாயங்களை அறிந்துகொள்ளுங்கள்..." if lang == "தமிழ்" else "Greetings! I am AI Valluvar. Ask your questions to get wisdom from Thirukkural..."
     
+# ... (உங்கள் பழைய கோடு: elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]: ...)
     if "messages" not in st.session_state:
         st.session_state.messages = [{"role": "assistant", "content": init_msg, "kural_data": None, "audio_html": ""}]
 
     # Display Chat History with Audio Embedded
-    for msg in st.session_state.messages:
+    for idx, msg in enumerate(st.session_state.messages):
         role = "assistant" if msg["role"] == "assistant" else "user"
         with st.chat_message(role):
             if role == "assistant" and "{" in msg["content"]:
@@ -539,8 +548,9 @@ Format: { "verdict": "அறிவுரை", "solution": "திருக்க
                                 audio_text += f"Solution: {r.get('solution', '')}. "
                                 audio_text += f"Warning: {r.get('consequence', '')}."
 
-                            # Generate and embed audio instantly
-                            audio_player_html = generate_edge_tts_audio(audio_text, lang)
+                            # Generate and embed audio instantly with Unique ID
+                            unique_id = f"audio_mentor_{int(time.time())}"
+                            audio_player_html = generate_edge_tts_audio(audio_text, lang, unique_id)
 
                             st.markdown(f"""
 <div class="result-card card-advice">
