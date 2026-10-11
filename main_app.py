@@ -1,8 +1,4 @@
 import streamlit as st
-import asyncio
-import edge_tts
-import tempfile
-import base64
 import textwrap
 import json
 import os
@@ -51,7 +47,6 @@ def generate_edge_tts_audio(text_to_read, lang_code, unique_id):
             
         b64 = base64.b64encode(audio_bytes).decode()
         
-        # Unique ID-ஐ HTML-ல் சேர்ப்பதன் மூலம் பழைய ஆடியோ ப்ளே ஆவது தடுக்கப்படும்.
         audio_html = f'<audio id="{unique_id}" controls style="width: 100%; height: 40px; margin-top: 15px; border-radius: 8px; outline: none;"><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>'
         
         os.remove(temp_audio_path)
@@ -127,43 +122,61 @@ def inject_custom_css_and_js():
             .stSelectbox label p, [data-testid="stSelectbox"] label p { color: #F0C96A !important; -webkit-text-fill-color: #F0C96A !important; font-weight: 700 !important; }
             .stSelectbox > div, .stSelectbox > div > div, [data-testid="stSelectbox"] > div, [data-baseweb="select"], [data-baseweb="select"] > div { background: #1A0808 !important; background-color: #1A0808 !important; }
             [data-baseweb="select"] > div { border: 2px solid #C9A84C !important; border-radius: 12px !important; }
-            [data-baseweb="select"] span, [data-baseweb="select"] [class*="placeholder"], [data-baseweb="select"] [class*="singleValue"], [data-baseweb="select"] [class*="valueContainer"] span { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 700 !important; font-size: 15px !important; }
+            [data-baseweb="select"] span, [data-baseweb="select"] [class*="placeholder"], [data-baseweb="select"] [class*="singleValue"], [data-baseweb="select"] [class*="valueContainer"] span { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 700 !important; font-size: 15px !important; background: transparent !important; }
             [data-baseweb="select"] svg { fill: #C9A84C !important; }
-            [data-baseweb="popover"], ul[role="listbox"], [data-testid="stVirtualDropdown"] { background: #1A0808 !important; background-color: #1A0808 !important; border: 2px solid #C9A84C !important; border-radius: 12px !important; }
-            li[role="option"] { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 600 !important; font-size: 15px !important; }
-            li[role="option"]:hover, li[role="option"][aria-selected="true"] { background: rgba(201,168,76,0.25) !important; color: #F0C96A !important; -webkit-text-fill-color: #F0C96A !important; }
-            div[role="radiogroup"] { background: linear-gradient(145deg, rgba(15,28,58,0.6) 0%, rgba(8,16,38,0.8) 100%); padding: 15px; border-radius: 20px; border: 1px solid rgba(201,168,76,0.2); display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+            [data-baseweb="popover"], [data-baseweb="popover"] > div, [data-baseweb="popover"] > div > div, [data-baseweb="popover"] > div > div > div, [data-baseweb="popover"] ul, [data-baseweb="menu"], [data-baseweb="menu"] > div, [data-baseweb="menu"] > div > div, ul[role="listbox"], [data-testid="stVirtualDropdown"], [data-testid="stVirtualDropdown"] > div, [data-testid="stVirtualDropdown"] > div > div { background: #1A0808 !important; background-color: #1A0808 !important; }
+            ul[role="listbox"], [data-baseweb="popover"] > div { border: 2px solid #C9A84C !important; border-radius: 12px !important; box-shadow: 0 8px 24px rgba(0,0,0,0.7) !important; overflow: hidden !important; }
+            li[role="option"], [data-baseweb="menu"] li, ul[role="listbox"] li { background: transparent !important; background-color: transparent !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 600 !important; font-size: 15px !important; padding: 12px 18px !important; }
+            li[role="option"]:hover, li[role="option"][aria-selected="true"] { background: rgba(201,168,76,0.25) !important; background-color: rgba(201,168,76,0.25) !important; color: #F0C96A !important; -webkit-text-fill-color: #F0C96A !important; }
+            div[role="radiogroup"] { background: linear-gradient(145deg, rgba(15,28,58,0.6) 0%, rgba(8,16,38,0.8) 100%); padding: 15px; border-radius: 20px; border: 1px solid rgba(201,168,76,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05); display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
             div[role="radiogroup"] label { background: rgba(255,255,255,0.08) !important; border-radius: 12px !important; border: 1px solid rgba(201,168,76,0.3) !important; padding: 12px 24px !important; cursor: pointer; }
-            div[role="radiogroup"] label p { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 700 !important; font-size: 15px !important; }
-            div[role="radiogroup"] label[data-checked="true"] { background: linear-gradient(135deg, #152A5A, #0A1835) !important; border-color: #F0C96A !important; box-shadow: 0 8px 20px rgba(10,30,100,0.5) !important; }
+            div[role="radiogroup"] label p, div[role="radiogroup"] label span, div[role="radiogroup"] label div { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 700 !important; font-size: 15px !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+            div[role="radiogroup"] label[data-checked="true"], div[role="radiogroup"] label:hover { background: linear-gradient(135deg, #152A5A, #0A1835) !important; border-color: #F0C96A !important; box-shadow: 0 8px 20px rgba(10,30,100,0.5) !important; }
             div[role="radiogroup"] label[data-checked="true"] p { color: #F0C96A !important; -webkit-text-fill-color: #F0C96A !important; }
             .stTextInput label p, .stChatInput label p { color: #C9A84C !important; font-size: 15px !important; font-weight: 700 !important; }
-            .stTextInput input, .stChatInput textarea { background-color: #0D1F3C !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; border: 1.5px solid rgba(201,168,76,0.5) !important; border-radius: 16px !important; padding: 15px !important; }
-            .result-card { background: linear-gradient(145deg, rgba(15,28,58,0.9), rgba(8,16,38,0.95)); border: 1px solid rgba(201,168,76,0.3); border-left: 4px solid #F0C96A; border-radius: 16px; padding: 30px 35px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); margin-bottom: 25px; text-align: left; }
-            .result-adhigaaram { display: inline-block; background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; padding: 8px 16px; font-size: 14.5px; font-weight: 700; color: #F0C96A !important; margin-bottom: 15px; }
+            .stTextInput input, .stChatInput textarea { background-color: #0D1F3C !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; caret-color: #F0C96A !important; font-weight: 600 !important; border: 1.5px solid rgba(201,168,76,0.5) !important; border-radius: 16px !important; padding: 15px !important; }
+            .stChatInput textarea::placeholder, .stTextInput input::placeholder { color: rgba(255,255,255,0.5) !important; -webkit-text-fill-color: rgba(255,255,255,0.5) !important; }
+            .stTextInput input:-webkit-autofill, .stTextInput input:-webkit-autofill:hover, .stTextInput input:-webkit-autofill:focus, .stTextInput input:-webkit-autofill:active { -webkit-box-shadow: 0 0 0 30px #0D1F3C inset !important; -webkit-text-fill-color: #FFFFFF !important; transition: background-color 5000s ease-in-out 0s; }
+            .result-card { background: linear-gradient(145deg, rgba(15,28,58,0.9), rgba(8,16,38,0.95)); border: 1px solid rgba(201,168,76,0.3); border-left: 4px solid #F0C96A; border-radius: 16px; padding: 30px 35px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); margin-bottom: 25px; text-align: left; overflow: hidden; max-width: 100%; }
+            .result-adhigaaram { display: inline-block; background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; padding: 8px 16px; font-size: 14.5px; font-weight: 700; color: #F0C96A !important; margin-bottom: 15px; letter-spacing: 0.5px; }
             .verdict-text { font-size: 17px !important; color: #FFFFFF !important; line-height: 1.9 !important; margin-top: 10px; }
-            .kural-meaning { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(201,168,76,0.2); font-size: 16.5px; color: rgba(255,255,255,0.9) !important; line-height: 1.9; }
+            .kural-meaning { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(201,168,76,0.2); font-size: 16.5px; color: rgba(255,255,255,0.9) !important; line-height: 1.9; letter-spacing: 0.3px;}
             .card-advice, .card-solution, .card-warning { padding: 30px !important; line-height: 1.9; margin-top: 15px; margin-bottom: 25px;}
             .kural-block { margin: 20px 0; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; border-left: 3px solid #C9A84C; width: 100%; box-sizing: border-box; overflow-x: auto !important; display: block; scrollbar-width: thin; scrollbar-color: #F0C96A rgba(255,255,255,0.08); }
             .kural-block::-webkit-scrollbar { height: 10px !important; display: block !important; -webkit-appearance: none !important; }
-            .kural-line1, .kural-line2 { font-family: 'Noto Serif Tamil', serif; font-weight: 700; color: #FFFFFF !important; line-height: 2.0; margin: 0 !important; width: max-content; text-align: left; }
-            .venba-tamil { display: block; width: max-content; min-width: 100%; }
-            .venba-tamil .kural-line1, .venba-tamil .kural-line2 { font-size: clamp(14px, 4vw, 22px); white-space: nowrap !important; }
+            .kural-block::-webkit-scrollbar-track { background: rgba(255,255,255,0.08) !important; border-radius: 10px !important; visibility: visible !important; }
+            .kural-block::-webkit-scrollbar-thumb { background: linear-gradient(90deg, #F0C96A, #C9A84C) !important; border-radius: 10px !important; border: 2px solid #050D1F !important; visibility: visible !important; }
+            .kural-block::-webkit-scrollbar-thumb:hover { background: #FFFFFF !important; }
+            .kural-line1, .kural-line2 { font-family: 'Noto Serif Tamil', serif; font-weight: 700; color: #FFFFFF !important; line-height: 2.0; margin: 0 !important; padding-right: 25px !important; padding-left: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; width: max-content; text-align: left; }
+            .venba-tamil { display: block; width: max-content; min-width: 100%; margin:0; padding:0; }
+            .venba-tamil .kural-line1, .venba-tamil .kural-line2 { font-size: clamp(14px, 4vw, 22px); white-space: nowrap !important; display: block; }
             .venba-eng { display: block; width: 100%; }
-            .venba-eng .kural-line1, .venba-eng .kural-line2 { font-size: clamp(14px, 4vw, 20px); white-space: normal !important; }
+            .venba-eng .kural-line1, .venba-eng .kural-line2 { font-size: clamp(14px, 4vw, 20px); white-space: normal !important; word-wrap: break-word !important; }
             .percentage-container { display: flex; flex-wrap: wrap; justify-content: space-around; background: rgba(13,28,56,0.8); border: 1px solid rgba(201,168,76,0.3); border-radius: 16px; padding: 15px; margin-bottom: 20px; }
             .percentage-item { font-size: 15px; font-weight: 700; margin: 5px; color: #FFFFFF !important; padding: 5px 10px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(201,168,76,0.2);}
             [data-testid="stChatMessage"] { background: linear-gradient(145deg, rgba(15,28,58,0.9), rgba(8,16,38,0.95)) !important; border: 1px solid rgba(201,168,76,0.3) !important; border-radius: 16px !important; padding: 25px !important; box-shadow: 0 8px 25px rgba(0,0,0,0.4) !important; margin-bottom: 30px !important; }
+            [data-testid="stBottom"] { position: static !important; background-color: transparent !important; }
             [data-testid="stBottomBlock"] { background: transparent !important; border: none !important; padding-bottom: 80px !important; margin-top: 30px;}
-            .stButton button { background: linear-gradient(135deg, #F0C96A, #C9A84C) !important; color: #050D1F !important; -webkit-text-fill-color: #050D1F !important; font-weight: 800 !important; font-size: 16px !important; border: none !important; border-radius: 12px !important; padding: 10px 25px !important; width: 100%; }
+            [data-testid="stBottomBlock"] > div, .stChatInputContainer { background: transparent !important; }
+            .stButton button { background: linear-gradient(135deg, #F0C96A, #C9A84C) !important; color: #050D1F !important; -webkit-text-fill-color: #050D1F !important; font-weight: 800 !important; font-size: 16px !important; border: none !important; border-radius: 12px !important; padding: 10px 25px !important; box-shadow: 0 8px 20px rgba(201,168,76,0.3) !important; width: 100%; }
             .footer-nav { position: fixed; left: 0; bottom: 0; width: 100%; height: 50px; background: #050D1F; border-top: 1px solid rgba(201,168,76,0.3); color: #C9A84C; text-align: center; display: flex; flex-direction: column; justify-content: center; z-index: 2000;}
             div.block-container { padding-top: 2rem; padding-bottom: 120px; position: relative; z-index: 10; }
             @media (max-width: 768px) {
                 .modal-box { width: 95%; padding: 20px; }
-                .result-card { padding: 18px 12px; border-radius: 12px; margin-bottom: 20px; width: 100%; max-width: 100vw; }
+                .modal-box h3 { font-size: 18px !important; }
+                .modal-box p, .modal-box span { font-size: 13px !important; }
+                .result-card { padding: 18px 12px; border-radius: 12px; margin-bottom: 20px; overflow: hidden; width: 100%; max-width: 100vw; }
+                div[role="radiogroup"] { padding: 10px; gap: 8px; }
                 div[role="radiogroup"] label { padding: 10px 10px !important; flex-grow: 1; text-align: center; }
-                .kural-block { padding: 12px 10px; width: 100%; overflow-x: auto !important; overflow-y: hidden; }
-                .venba-tamil .kural-line1, .venba-tamil .kural-line2 { font-size: clamp(11px, 3.3vw, 16px) !important; }
+                div[role="radiogroup"] label p, div[role="radiogroup"] label span { font-size: 12px !important; }
+                .kural-block { padding: 12px 10px; width: 100%; box-sizing: border-box; overflow-x: auto !important; overflow-y: hidden; -webkit-overflow-scrolling: touch !important; display: block; }
+           .kural-block::-webkit-scrollbar { display: block !important; height: 6px !important; -webkit-appearance: none !important; }
+                .kural-block::-webkit-scrollbar-track { background: rgba(255,255,255,0.08) !important; visibility: visible !important; }
+                .kural-block::-webkit-scrollbar-thumb { background: #F0C96A !important; border-radius: 10px !important; visibility: visible !important; }
+                .venba-tamil { width: max-content !important; display: block; }
+                .venba-tamil .kural-line1, .venba-tamil .kural-line2 { font-size: clamp(11px, 3.3vw, 16px) !important; letter-spacing: -0.1px !important; white-space: nowrap !important; padding-right: 20px !important; margin: 0 !important; display: block; width: max-content !important; }
+                .stChatInput textarea, .stTextInput input { font-size: 14px !important; }
+                [data-testid="stChatMessage"] { padding: 15px 12px !important; }
             }
         </style>
     """, unsafe_allow_html=True)
@@ -173,7 +186,9 @@ def inject_custom_css_and_js():
                 const doc = window.parent.document;
                 const selectors = ['#MainMenu', 'header', 'footer', '.stDeployButton'];
                 selectors.forEach(s => { const els = doc.querySelectorAll(s); els.forEach(e => e.style.display = 'none'); });
-                doc.querySelectorAll('[data-baseweb="select"] > div > div').forEach(el => { el.style.backgroundColor = '#1A0808'; });
+                doc.querySelectorAll('[data-baseweb="select"] > div > div').forEach(el => {
+                    el.style.backgroundColor = '#1A0808';
+                });
             }
             setInterval(initEliteUI, 80);
         </script>
@@ -196,17 +211,27 @@ st.markdown("""
 <div class="modal-box">
 <label for="modal-toggle" class="close-btn">✖</label>
 <h3 style="color: #F0C96A !important; font-size: 22px; font-family: 'Cinzel', serif; margin-top:0; margin-bottom: 15px;">VALLUVAR 2.0</h3>
-<p style="color: #FFFFFF !important; font-size: 14px; line-height: 1.6; margin-bottom: 15px; text-align: center;">வாழ்க்கையில் பிரச்சனைகளா? உங்கள் அனைத்து உளவியல் போராட்டங்களுக்கும் வள்ளுவரின் 1330 குறள்கள் வழியே தீர்வு காண்போம்.</p>
+
+<p style="color: #FFFFFF !important; font-size: 14px; line-height: 1.6; margin-bottom: 15px; text-align: center;">
+வாழ்க்கையில் பிரச்சனைகளா? உங்கள் அனைத்து உளவியல் போராட்டங்களுக்கும் வள்ளுவரின் 1330 குறள்கள் வழியே தீர்வு காண்போம்.<br><br>
+<i style="color: rgba(255,255,255,0.8); font-size: 13.5px;">Facing life's challenges? Find solutions to all your emotional and psychological struggles through the wisdom of 1330 Thirukkurals.</i>
+</p>
+
 <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(201,168,76,0.2); border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: left;">
 <span style="color: #F0C96A !important; font-weight: bold; font-size: 14px;">✨ Key Features:</span><br>
 <span style="color: #E0E0E0 !important; font-size: 13px;">🌐 Dual Language Support (Tamil/Eng)</span><br>
 <span style="color: #E0E0E0 !important; font-size: 13px;">⚖️ Contextual Life Verdicts</span><br>
 <span style="color: #E0E0E0 !important; font-size: 13px;">🤖 Interactive AI Mentor</span>
 </div>
+
 <div style="background: rgba(255,100,100,0.1); border: 1px solid rgba(255,100,100,0.3); border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: left;">
 <span style="color: #FF8A80 !important; font-weight: bold; font-size: 14px;">📌 Important Note:</span><br>
-<p style="color: #E0E0E0 !important; font-size: 12.5px; line-height: 1.6; margin: 8px 0 0 0;"><b>1. Scroll to Read:</b> திருக்குறள் வரிகள் நீளமாக இருந்தால், பெட்டியை வலதுபுறம் Scroll / Swipe செய்து முழுமையாக வாசிக்கவும்.<br><br><b>2. 100% Privacy:</b> உங்கள் பெயர், முகவரி, Phone Number, IP Address போன்ற எந்த தனிப்பட்ட தரவுகளும் (Personal Data) எங்களால் சேகரிக்கப்படாது.</p>
+<p style="color: #E0E0E0 !important; font-size: 12.5px; line-height: 1.6; margin: 8px 0 0 0;">
+<b>1. Scroll to Read:</b> திருக்குறள் வரிகள் நீளமாக இருந்தால், பெட்டியை வலதுபுறம் Scroll / Swipe செய்து முழுமையாக வாசிக்கவும்.<br><br>
+<b>2. 100% Privacy:</b> உங்கள் பெயர், முகவரி, Phone Number, IP Address போன்ற எந்த தனிப்பட்ட தரவுகளும் (Personal Data) எங்களால் சேகரிக்கப்படாது.
+</p>
 </div>
+
 <div style="border-top: 1px dashed rgba(201,168,76,0.4); margin-top: 15px; padding-top: 15px; font-size: 13px; color: rgba(255,255,255,0.7) !important;">
 Idealogy & Developed by<br><strong style="color: #F0C96A !important; font-size: 15px;">VIGNESH M (MIN E KAVI)</strong>
 </div>
@@ -222,23 +247,31 @@ with col2:
     lang = st.selectbox("🌐 Select Language / மொழி:", ["தமிழ்", "English"])
 
 # ==========================================
-# 1. SMART API & DATA MANAGEMENT
+# 1. SMART API KEY ROTATION SYSTEM (FIXED QUOTA ISSUE)
 # ==========================================
-@st.cache_resource
-def load_model():
+def get_ai_response(prompt_text):
     key_list = ["key1", "key2", "key3", "key4", "key5"]
+    
     for key_name in key_list:
         try:
             api_key = st.secrets.get(key_name)
-            if not api_key: continue
+            if not api_key: 
+                continue
+            
             genai.configure(api_key=api_key)
-            list(genai.list_models()) 
-            return genai.GenerativeModel("gemini-2.5-flash")
-        except: continue
-    st.error("❌ All API Keys Failed! Please update secrets.")
+            temp_model = genai.GenerativeModel("gemini-2.5-flash")
+            response = temp_model.generate_content(prompt_text)
+            
+            return response
+            
+        except Exception as e:
+            error_str = str(e).lower()
+            if "429" in error_str or "quota" in error_str or "exhausted" in error_str:
+                continue
+            else:
+                continue
+                
     return None
-
-model = load_model()
 
 @st.cache_data
 def load_data():
@@ -250,7 +283,9 @@ def load_data():
             if isinstance(data, dict):
                 return data.get("kural", data.get("kurals", []))
             return data
-    except: return []
+    except Exception as e:
+        send_error_alert(f"Failed to load thirukkural.json: {e}")
+        return []
 
 kurals_list = load_data()
 
@@ -277,9 +312,11 @@ def get_kural_from_local(kural_no, lang_mode):
     try:
         k_no = int(str(kural_no).strip()) if kural_no else 1
         if k_no < 1 or k_no > 1330: k_no = 1
+        
         for k in kurals_list:
             if int(k.get('Number', k.get('number', k.get('KuralNo', 0)))) == k_no:
                 l1, l2 = format_strict_venba(k.get('Line1', k.get('line1', '')), k.get('Line2', k.get('line2', '')))
+                
                 if lang_mode == "English":
                     eng_line = k.get('Translation', k.get('translation', k.get('eng', l1)))
                     eng_exp = k.get('explanation', k.get('eng_exp', k.get('Explanation', '')))
@@ -288,9 +325,13 @@ def get_kural_from_local(kural_no, lang_mode):
                     exp_keys = ['mv', 'tamil_exp', 'vilakkam', 'sp', 'mk']
                     tam_exp = next((k[key] for key in exp_keys if key in k), 'விளக்கம் இல்லை')
                     return {"line1": l1, "line2": l2, "meaning": tam_exp, "number": k_no}
-    except: pass
-    if lang_mode == "English": return {"line1": "'A' leads letters; the Ancient Lord Leads and lords the entire world", "line2": "", "meaning": "As the letter A is the first of all letters, so the eternal God is first in the world", "number": 1}
-    else: return {"line1": "அகர முதல எழுத்தெல்லாம் ஆதி", "line2": "பகவன் முதற்றே உலகு.", "meaning": "எழுத்துக்கள் எல்லாம் அகரத்தை அடிப்படையாக கொண்டிருக்கின்றன. அதுபோல உலகம் கடவுளை அடிப்படையாக கொண்டிருக்கிறது.", "number": 1}
+    except Exception as e:
+        pass
+    
+    if lang_mode == "English":
+        return {"line1": "'A' leads letters; the Ancient Lord Leads and lords the entire world", "line2": "", "meaning": "As the letter A is the first of all letters, so the eternal God is first in the world", "number": 1}
+    else:
+        return {"line1": "அகர முதல எழுத்தெல்லாம் ஆதி", "line2": "பகவன் முதற்றே உலகு.", "meaning": "எழுத்துக்கள் எல்லாம் அகரத்தை அடிப்படையாக கொண்டிருக்கின்றன. அதுபோல உலகம் கடவுளை அடிப்படையாக கொண்டிருக்கிறது.", "number": 1}
 
 def simulate_traffic_control(lang):
     loading_container = st.empty()
@@ -321,7 +362,9 @@ selected_option = st.radio("", menu_options, horizontal=True)
 if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Search"]:
     if "search_limit" not in st.session_state: st.session_state.search_limit = 10
     search_term = st.text_input("தேட வேண்டிய சொல் / Search Keyword:", placeholder=placeholder_text)
+    
     if st.button(btn_search): st.session_state.search_limit = 10 
+
     if kurals_list and search_term:
         results = [k for k in kurals_list if search_term.lower() in str(k).lower()]
         if results:
@@ -329,9 +372,11 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
             st.success(f"✅ Found {total_results} results / {total_results} குறள்கள் கிடைத்தன:")
             for item in results[:st.session_state.search_limit]:
                 venba_class = "venba-eng" if lang == "English" else "venba-tamil"
+                
                 if lang == "English":
                     k_line1 = item.get('Translation', item.get('translation', item.get('eng', item.get('Line1', ''))))
-                    k_line2, k_mean = "", item.get('explanation', item.get('eng_exp', 'No explanation available.'))
+                    k_line2 = "" 
+                    k_mean = item.get('explanation', item.get('eng_exp', 'No explanation available.'))
                 else:
                     k_line1, k_line2 = format_strict_venba(item.get('Line1', item.get('line1', '')), item.get('Line2', item.get('line2', '')))
                     exp_keys = ['mv', 'tamil_exp', 'vilakkam', 'sp', 'mk']
@@ -344,11 +389,15 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
 <div class="result-card">
 <div class="result-adhigaaram">{lbl_kno} {kno}</div>
 <div class="kural-block">
-<div class="{venba_class}"><div class="kural-line1">{k_line1}</div>{kural_line2_html}</div>
+<div class="{venba_class}">
+<div class="kural-line1">{k_line1}</div>
+{kural_line2_html}
+</div>
 </div>
 <div class="kural-meaning"><strong>{lbl_exp}</strong><br>{k_mean}</div>
 </div>
 """, unsafe_allow_html=True)
+            
             if st.session_state.search_limit < total_results:
                 btn_more = f"⬇️ Show More ({total_results - st.session_state.search_limit})" if lang == "English" else f"⬇️ இன்னும் காட்டு ({total_results - st.session_state.search_limit})"
                 if st.button(btn_more):
@@ -358,20 +407,18 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
             if search_term: st.warning("No related Kural found. / தொடர்புடைய குறள் எதுவும் இல்லை.")
 
 # ==================================================
-# 2. VERDICT (Dynamic UI: STRICT 100% PERCENTAGE SPLIT)
+# 2. VERDICT 
 # ==================================================
 elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI Verdict"]:
     user_input = st.text_input("உங்கள் குழப்பம் / Your Situation (e.g. கடன் வாங்கலாமா ? / Should I take a loan?):")
     if st.button(btn_verdict):
         if not user_input: st.warning("Please type your question.")
-        elif not model: st.error("No AI Connection.")
         else:
             simulate_traffic_control(lang)
             with st.spinner("📜 Analyzing your situation..."):
                 try:
                     venba_class = "venba-eng" if lang == "English" else "venba-tamil"
                     
-                    # 🔥 AI CONCEPT IMPLEMENTATION: 100% EXACT SPLIT & THIRUKKURAL PHILOSOPHY
                     if lang == "English":
                         prompt = f"""Context: '{user_input}'. Act as Thiruvalluvar. Reply strictly in JSON. 
 Analyze the situation and distribute exactly 100% among 'aram', 'porul', and 'inbam' based on Valluvar's philosophy.
@@ -399,8 +446,11 @@ Format: {{"verdict": "Short advice", "aram": 40, "porul": 30, "inbam": 30, "kura
 Format: {{"verdict": "அறிவுரை", "aram": 40, "porul": 30, "inbam": 30, "kural_number": 1100, "adhigaaram": "அதிகாரத்தின் பெயர்"}}"""
                         lbl_aram, lbl_porul, lbl_inbam = "⚖️ அறம்", "💰 பொருள்", "❤️ அமைதி/இன்பம்"
 
-                    response = model.generate_content(prompt)
-                    res = extract_json_from_text(response.text)
+                    response = get_ai_response(prompt)
+                    if response:
+                        res = extract_json_from_text(response.text)
+                    else:
+                        res = None
                     
                     if res:
                         log_to_gsheets("Decision Mode", user_input, res.get('verdict', ''))
@@ -410,14 +460,12 @@ Format: {{"verdict": "அறிவுரை", "aram": 40, "porul": 30, "inbam": 
                         
                         dynamic_ui_html = ""
                         
-                        # --- AUDIO SCRIPT GENERATION ---
                         verdict_text = res.get('verdict', '')
                         if lang == "தமிழ்":
                             audio_text = f"அறிவுரை: {verdict_text}. "
                         else:
                             audio_text = f"Advice: {verdict_text}. "
                             
-                        # Ensure values are parsed as integers
                         arm, prl, inb = int(res.get('aram', 34)), int(res.get('porul', 33)), int(res.get('inbam', 33))
                         
                         dynamic_ui_html = f"""<div class="percentage-container">
@@ -430,7 +478,6 @@ Format: {{"verdict": "அறிவுரை", "aram": 40, "porul": 30, "inbam": 
                         else:
                             audio_text += f" In this, Virtue is {arm} percent, Wealth is {prl} percent, and Joy is {inb} percent."
                         
-                        # Generate Audio with Unique ID based on timestamp
                         unique_id = f"audio_verdict_{int(time.time())}"
                         audio_player_html = generate_edge_tts_audio(audio_text, lang, unique_id)
                         
@@ -450,7 +497,7 @@ Format: {{"verdict": "அறிவுரை", "aram": 40, "porul": 30, "inbam": 
 </div>
 """, unsafe_allow_html=True)
                     else:
-                        st.error("AI Output Error.")
+                        st.error("AI Output Error or Quota Exhausted on all keys.")
                 except Exception as e:
                     send_error_alert(f"Verdict Generation Error: {e}")
                     st.error(f"Error: {e}")
@@ -464,7 +511,6 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
     if "messages" not in st.session_state:
         st.session_state.messages = [{"role": "assistant", "content": init_msg, "kural_data": None, "audio_html": ""}]
 
-    # Display Chat History with Audio Embedded
     for msg in st.session_state.messages:
         role = "assistant" if msg["role"] == "assistant" else "user"
         with st.chat_message(role):
@@ -503,56 +549,56 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"): st.write(prompt)
 
-        if model:
-            with st.chat_message("assistant"):
-                with st.spinner("📜 வள்ளுவர் is thinking..."):
-                    try:
-                        venba_class = "venba-eng" if lang == "English" else "venba-tamil"
-                        
-                        # 🔥 TONE CORRECTION & BUG FIX ADDED
-                        if lang == "English":
-                            sys_msg = """Act as Thiruvalluvar. Reply strictly in JSON format.
+        with st.chat_message("assistant"):
+            with st.spinner("📜 வள்ளுவர் is thinking..."):
+                try:
+                    venba_class = "venba-eng" if lang == "English" else "venba-tamil"
+                    
+                    if lang == "English":
+                        sys_msg = """Act as Thiruvalluvar. Reply strictly in JSON format.
 CRITICAL GUARDRAILS:
 1. DO NOT invent or hallucinate any Thirukkural. Only select a real 'kural_number' between 1 and 1330.
 2. The 'adhigaaram' MUST exactly match the official Thirukkural chapter name.
 3. TONE: Speak like a wise mentor or a caring friend. Use simple, conversational, and practical English. Keep the length medium (2 to 3 sentences).
 Format: { "verdict": "Your actual short, direct advice for the situation", "solution": "Actionable, simple, conversational solution spoken from your perspective", "consequence": "A friendly but firm warning if ignored, in simple words", "kural_number": 120, "adhigaaram": "Exact Chapter Name" }"""
-                        else:
-                            sys_msg = """நீ திருவள்ளுவர். பதில் JSON வடிவில் மட்டும் தமிழில் இருக்க வேண்டும்.
+                    else:
+                        sys_msg = """நீ திருவள்ளுவர். பதில் JSON வடிவில் மட்டும் தமிழில் இருக்க வேண்டும்.
 முக்கிய கட்டுப்பாடுகள் (CRITICAL GUARDRAILS):
 1. சொந்தமாக திருக்குறளை உருவாக்கக் கூடாது. 1 முதல் 1330 வரை உள்ள உண்மையான குறள் எண்களை ('kural_number') மட்டுமே பயன்படுத்த வேண்டும்.
 2. 'adhigaaram' சரியான அதிகாரத்தின் பெயராக இருக்க வேண்டும்.
 3. மொழிநடை (TONE): மிகவும் தூய தமிழில் இல்லாமல், ஒரு சக மனிதனிடம் / நண்பனிடம் இயல்பாகப் பேசுவது போல எளிய தமிழில் இருக்க வேண்டும். அளவு நடுத்தரமாக (2 அல்லது 3 வாக்கியங்கள்) இருக்க வேண்டும்.
 Format: { "verdict": "சூழலுக்கான உங்களின் சுருக்கமான, நேரடியான அறிவுரை", "solution": "திருக்குறளை விளக்காமல், நீங்களே நேரில் சொல்வது போன்ற எளிய, நடைமுறை தீர்வு", "consequence": "இதை பின்பற்றாவிட்டால் வரக்கூடிய விளைவுகள் பற்றிய எச்சரிக்கை (எளிய தமிழில்)", "kural_number": 120, "adhigaaram": "சரியான அதிகாரத்தின் பெயர்" }"""
-                        
-                        response = model.generate_content(sys_msg + "\n\nQuestion/கேள்வி: " + prompt)
+                    
+                    response = get_ai_response(sys_msg + "\n\nQuestion/கேள்வி: " + prompt)
+                    
+                    if response:
                         r = extract_json_from_text(response.text)
-                        
-                        if r:
-                            log_to_gsheets("Chat Mode", prompt, r.get('verdict', ''))
-                            local_data = get_kural_from_local(r.get('kural_number', 1), lang)
-                            kural_line2_html = f'<div class="kural-line2">{local_data["line2"]}</div>' if local_data["line2"] else ''
-                            ai_chap = r.get('adhigaaram', 'அதிகாரம்')
+                    else:
+                        r = None
+                    
+                    if r:
+                        log_to_gsheets("Chat Mode", prompt, r.get('verdict', ''))
+                        local_data = get_kural_from_local(r.get('kural_number', 1), lang)
+                        kural_line2_html = f'<div class="kural-line2">{local_data["line2"]}</div>' if local_data["line2"] else ''
+                        ai_chap = r.get('adhigaaram', 'அதிகாரம்')
 
-                            # --- AUDIO SCRIPT GENERATION ---
-                            if lang == "தமிழ்":
-                                audio_text = f"அறிவுரை: {r.get('verdict', '')}. "
-                                audio_text += f"குறள்: {local_data['line1']} {local_data['line2']}. "
-                                audio_text += f"விளக்கம்: {local_data['meaning']}. "
-                                audio_text += f"தீர்வு: {r.get('solution', '')}. "
-                                audio_text += f"எச்சரிக்கை: {r.get('consequence', '')}."
-                            else:
-                                audio_text = f"Advice: {r.get('verdict', '')}. "
-                                audio_text += f"Kural: {local_data['line1']}. "
-                                audio_text += f"Explanation: {local_data['meaning']}. "
-                                audio_text += f"Solution: {r.get('solution', '')}. "
-                                audio_text += f"Warning: {r.get('consequence', '')}."
+                        if lang == "தமிழ்":
+                            audio_text = f"அறிவுரை: {r.get('verdict', '')}. "
+                            audio_text += f"குறள்: {local_data['line1']} {local_data['line2']}. "
+                            audio_text += f"விளக்கம்: {local_data['meaning']}. "
+                            audio_text += f"தீர்வு: {r.get('solution', '')}. "
+                            audio_text += f"எச்சரிக்கை: {r.get('consequence', '')}."
+                        else:
+                            audio_text = f"Advice: {r.get('verdict', '')}. "
+                            audio_text += f"Kural: {local_data['line1']}. "
+                            audio_text += f"Explanation: {local_data['meaning']}. "
+                            audio_text += f"Solution: {r.get('solution', '')}. "
+                            audio_text += f"Warning: {r.get('consequence', '')}."
 
-                            # Generate and embed audio instantly with Unique ID
-                            unique_id = f"audio_mentor_{int(time.time())}"
-                            audio_player_html = generate_edge_tts_audio(audio_text, lang, unique_id)
+                        unique_id = f"audio_mentor_{int(time.time())}"
+                        audio_player_html = generate_edge_tts_audio(audio_text, lang, unique_id)
 
-                            st.markdown(f"""
+                        st.markdown(f"""
 <div class="result-card card-advice">
 <div class="result-adhigaaram">{lbl_advice}</div><div class="verdict-text">{r.get('verdict')}</div>
 </div>
@@ -571,13 +617,15 @@ Format: { "verdict": "சூழலுக்கான உங்களின் �
 </div>
 {audio_player_html}
 """, unsafe_allow_html=True)
-                            st.session_state.messages.append({"role": "assistant", "content": response.text, "kural_data": local_data, "audio_html": audio_player_html})
-                        else:
-                            st.write(response.text)
-                            st.session_state.messages.append({"role": "assistant", "content": response.text, "audio_html": ""})
-                    except Exception as e:
-                        send_error_alert(f"AI Mentor Generation Error: {e}")
-                        st.error(f"Error: {e}")
+                        st.session_state.messages.append({"role": "assistant", "content": response.text, "kural_data": local_data, "audio_html": audio_player_html})
+                    else:
+                        error_text = "AI Output Error or Quota Exhausted on all keys."
+                        st.write(error_text)
+                        st.session_state.messages.append({"role": "assistant", "content": error_text, "audio_html": ""})
+                except Exception as e:
+                    send_error_alert(f"AI Mentor Generation Error: {e}")
+                    st.error(f"Error: {e}")
+
 # --- FOOTER ---
 st.markdown("""
 <div class="footer-nav">
