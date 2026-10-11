@@ -561,13 +561,12 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
                  else: st.write(msg["content"])
             else: st.write(msg["content"])
 
-    # --- CHAT INPUT & VOICE SECTION ---
+# --- CHAT INPUT & VOICE SECTION ---
     st.markdown("---")
     st.markdown(f"<p style='color:#F0C96A; font-weight:bold; font-size:15px;'>{'🎤 வள்ளுவரிடம் குரல் மூலம் கேட்க:' if lang == 'தமிழ்' else '🎤 Speak to Valluvar:'}</p>", unsafe_allow_html=True)
     
     col_m1, col_m2 = st.columns([1, 8])
     with col_m1:
-        # 🔥 BUG FIX: Using just_once=True and simple emoji icons
         spoken_mentor = speech_to_text(
             start_prompt="🎙️", 
             stop_prompt="🛑", 
@@ -579,17 +578,21 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
     with col_m2:
         st.markdown("<p style='font-size:13px; color:gray; margin-top: 10px;'><i>(மைக் ஐகானை கிளிக் செய்து பேசவும்)</i></p>", unsafe_allow_html=True)
 
-    # 🔥 BUG FIX: Store speech persistently in session state
-    if spoken_mentor:
-        st.session_state["mentor_text_area"] = spoken_mentor
+    # 🔥 BUG FIX: Use a custom state variable instead of directly targeting the widget's key
+    if "mentor_input_val" not in st.session_state:
+        st.session_state["mentor_input_val"] = ""
 
-    prompt_val = st.text_area("கேள்வியை தட்டச்சு செய்யவும் / Type your question:", key="mentor_text_area", height=80)
+    if spoken_mentor:
+        st.session_state["mentor_input_val"] = spoken_mentor
+
+    # Changed 'key' to 'value' to prevent the Instantiation Error
+    prompt_val = st.text_area("கேள்வியை தட்டச்சு செய்யவும் / Type your question:", value=st.session_state["mentor_input_val"], height=80)
 
     if st.button("அனுப்பு / Send", key="send_mentor_btn"):
         if prompt_val:
             st.session_state.messages.append({"role": "user", "content": prompt_val})
-            # Clear text box after sending successfully!
-            st.session_state["mentor_text_area"] = "" 
+            # Clear text box safely!
+            st.session_state["mentor_input_val"] = "" 
             st.rerun()
 
     # Handle the backend logic if the last message was from the user
