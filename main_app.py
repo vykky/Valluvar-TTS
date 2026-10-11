@@ -131,14 +131,30 @@ def inject_custom_css_and_js():
             .close-btn:hover { color: #FFF !important; transform: scale(1.1); }
             .modal-bg-close { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; cursor: default; }
 
-            /* LANGUAGE DROPDOWN FIX */
-            .stSelectbox label p, [data-testid="stSelectbox"] label p { color: #F0C96A !important; font-weight: 700 !important; }
-            [data-baseweb="select"] > div { background-color: #1A0808 !important; border: 2px solid #C9A84C !important; border-radius: 12px !important; }
-            [data-baseweb="select"] div[class*="singleValue"], [data-baseweb="select"] span { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 700 !important; font-size: 15px !important; }
+            /* LANGUAGE DROPDOWN FIX (Modern Streamlit Version) */
+            .stSelectbox label p, [data-testid="stSelectbox"] label p { color: #F0C96A !important; font-weight: 800 !important; font-size: 16px !important; }
+            
+            /* Main Input Box Background */
+            [data-baseweb="select"] { background-color: #050D1F !important; }
+            [data-baseweb="select"] > div { background-color: #0D1F3C !important; border: 2px solid rgba(201,168,76,0.5) !important; border-radius: 12px !important; }
+            
+            /* Selected Text Color inside Box */
+            [data-baseweb="select"] div[class*="singleValue"], [data-baseweb="select"] span { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 800 !important; font-size: 16px !important; }
+            
+            /* Dropdown Arrow */
             [data-baseweb="select"] svg { fill: #C9A84C !important; }
-            div[data-baseweb="popover"] > div, ul[role="listbox"] { background: #050D1F !important; background-color: #050D1F !important; border: 1px solid #C9A84C !important; border-radius: 8px !important; }
-            ul[role="listbox"] li[role="option"] { background-color: transparent !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 600 !important; font-size: 15px !important; padding: 12px 18px !important; }
-            ul[role="listbox"] li[role="option"]:hover, ul[role="listbox"] li[role="option"][aria-selected="true"] { background-color: rgba(201,168,76,0.3) !important; color: #F0C96A !important; -webkit-text-fill-color: #F0C96A !important; }
+            
+            /* Dropdown Menu Box Background (The Popover) */
+            [data-baseweb="popover"] { background-color: #050D1F !important; }
+            [data-baseweb="popover"] > div { background-color: #0D1F3C !important; border: 2px solid #C9A84C !important; border-radius: 12px !important; box-shadow: 0 8px 32px rgba(0,0,0,0.8) !important; }
+            [data-baseweb="menu"] { background-color: transparent !important; }
+            ul[role="listbox"] { background-color: transparent !important; }
+            
+            /* Dropdown List Items */
+            ul[role="listbox"] li[role="option"] { background-color: transparent !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 700 !important; font-size: 16px !important; padding: 12px 18px !important; }
+            
+            /* Hover & Selected state for List Items */
+            ul[role="listbox"] li[role="option"]:hover, ul[role="listbox"] li[role="option"][aria-selected="true"] { background-color: rgba(201,168,76,0.25) !important; color: #F0C96A !important; -webkit-text-fill-color: #F0C96A !important; font-weight: 800 !important; }
 
             /* RADIO BUTTONS */
             div[role="radiogroup"] { background: linear-gradient(145deg, rgba(15,28,58,0.6) 0%, rgba(8,16,38,0.8) 100%); padding: 15px; border-radius: 20px; border: 1px solid rgba(201,168,76,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05); display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
