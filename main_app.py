@@ -233,7 +233,7 @@ def load_model():
             if not api_key: continue
             genai.configure(api_key=api_key)
             list(genai.list_models()) 
-            return genai.GenerativeModel("gemini-2.5-flash")
+            return genai.GenerativeModel("gemini-1.5-flash")
         except: continue
     st.error("❌ All API Keys Failed! Please update secrets.")
     return None
