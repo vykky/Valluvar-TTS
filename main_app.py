@@ -358,7 +358,7 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
             if search_term: st.warning("No related Kural found. / தொடர்புடைய குறள் எதுவும் இல்லை.")
 
 # ==================================================
-# 2. VERDICT 
+# 2. VERDICT (Dynamic UI: Situation -> %, General -> Tags)
 # ==================================================
 elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI Verdict"]:
     user_input = st.text_input("உங்கள் குழப்பம் / Your Situation (e.g. கடன் வாங்கலாமா ? / Should I take a loan?):")
@@ -368,7 +368,6 @@ elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI
         else:
             simulate_traffic_control(lang)
             with st.spinner("📜 Analyzing your situation..."):
-              # ... (உங்கள் பழைய கோடு: elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI Verdict"]: ...)
                 try:
                     venba_class = "venba-eng" if lang == "English" else "venba-tamil"
                     
@@ -449,12 +448,15 @@ Format: {{"verdict": "அறிவுரை", "is_general": "no", "aram": 0, "po
 <div class="kural-meaning"><strong>{lbl_exp}</strong><br>{local_data['meaning']}</div>
 </div>
 """, unsafe_allow_html=True)
-                        
-                        # 🔥 BUG FIX: Reset Streamlit state input values manually using HTML tricks if needed, 
-                        # or let Streamlit handle it natively since we are not using st.form.
                     else:
                         st.error("AI Output Error.")
-# ... (உங்கள் பழைய கோடு தொடரும்)
+                except Exception as e:
+                    send_error_alert(f"Verdict Generation Error: {e}")
+                    st.error(f"Error: {e}")
+
+# ==================================================
+# 3. AI MENTOR (Untouched as requested)
+# ==================================================
 # ==================================================
 # 3. AI MENTOR 
 # ==================================================
