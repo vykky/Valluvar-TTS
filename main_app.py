@@ -407,7 +407,7 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
             if search_term: st.warning("No related Kural found. / தொடர்புடைய குறள் எதுவும் இல்லை.")
 
 # ==================================================
-# 2. VERDICT 
+# 2. VERDICT (Dynamic UI: STRICT 100% SPLIT & CONVERSATIONAL TONE)
 # ==================================================
 elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI Verdict"]:
     user_input = st.text_input("உங்கள் குழப்பம் / Your Situation (e.g. கடன் வாங்கலாமா ? / Should I take a loan?):")
@@ -419,6 +419,7 @@ elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI
                 try:
                     venba_class = "venba-eng" if lang == "English" else "venba-tamil"
                     
+                    # 🔥 AI CONCEPT: 100% EXACT SPLIT & CONVERSATIONAL TONE GUARDRAIL
                     if lang == "English":
                         prompt = f"""Context: '{user_input}'. Act as Thiruvalluvar. Reply strictly in JSON. 
 Analyze the situation and distribute exactly 100% among 'aram', 'porul', and 'inbam' based on Valluvar's philosophy.
@@ -426,11 +427,11 @@ CRITICAL RULE: The sum of aram, porul, and inbam MUST EXACTLY equal 100 (e.g., 5
 1. 'aram' (Virtue): The ethical weight of the action. (For evil acts like murder/harm, aram = 0).
 2. 'porul' (Wealth/Reality): The material or practical aspect.
 3. 'inbam' (Joy): THIRUKKURAL RULE: True joy depends on virtue. If 'aram' is 0, 'inbam' MUST be 0.
-(Example: For "stealing", Aram=0, Inbam=0, Porul=100 because it's purely materialistic and unethical).
 CRITICAL GUARDRAILS:
 1. DO NOT invent Kurals. Use only real 'kural_number' (1-1330).
 2. 'adhigaaram' MUST exactly match the official chapter name for that Kural.
-Format: {{"verdict": "Short advice", "aram": 40, "porul": 30, "inbam": 30, "kural_number": 120, "adhigaaram": "Chapter Name"}}"""
+3. TONE: Speak like a wise mentor or a caring friend. Use simple, conversational, and practical English. Keep the length medium (2 to 3 sentences).
+Format: {{"verdict": "Your actual short, direct, conversational advice for the situation", "aram": 40, "porul": 30, "inbam": 30, "kural_number": 120, "adhigaaram": "Chapter Name"}}"""
                         lbl_aram, lbl_porul, lbl_inbam = "⚖️ Virtue", "💰 Wealth", "❤️ Peace/Love"
                     else:
                         prompt = f"""சூழல்: '{user_input}'. நீ திருவள்ளுவர். பதில் JSON-ல் மட்டும்.
@@ -439,11 +440,11 @@ Format: {{"verdict": "Short advice", "aram": 40, "porul": 30, "inbam": 30, "kura
 1. 'aram' (அறம்): செயலின் தர்மம். (கொலை, திருடு போன்ற தீய செயல்களுக்கு அறம் 0 ஆக இருக்க வேண்டும்).
 2. 'porul' (பொருள்): செயலின் உலகியல்/பொருளாதார நோக்கம்.
 3. 'inbam' (இன்பம்): வள்ளுவர் விதியின்படி அறம் இருந்தால்தான் இன்பம் இருக்கும். 'aram' 0 என்றால், 'inbam' கண்டிப்பாக 0 ஆக இருக்க வேண்டும்.
-(எடுத்துக்காட்டு: "திருடலாமா?" என்ற கேள்விக்கு அறம்=0, இன்பம்=0, பொருள்=100 எனப் பிரிக்கலாம். இது முற்றிலும் பொருள் சார்ந்த தீய செயல் என்பதைக் குறிக்கும்).
 முக்கிய கட்டுப்பாடுகள் (CRITICAL GUARDRAILS):
 1. சொந்தமாக குறளை உருவாக்கக் கூடாது. 1 முதல் 1330 வரை உள்ள உண்மையான 'kural_number' மட்டுமே பயன்படுத்தவும்.
 2. 'adhigaaram' பெயர் தேர்ந்தெடுக்கப்பட்ட குறளுக்கு உரியதாக மட்டுமே இருக்க வேண்டும்.
-Format: {{"verdict": "அறிவுரை", "aram": 40, "porul": 30, "inbam": 30, "kural_number": 1100, "adhigaaram": "அதிகாரத்தின் பெயர்"}}"""
+3. மொழிநடை (TONE): அறிவுரை மிகவும் தூய/கடினமான தமிழில் இல்லாமல், ஒரு சக மனிதனிடம் அல்லது நண்பனிடம் இயல்பாகப் பேசுவது போல எளிய தமிழில், நடுத்தர அளவில் (2 அல்லது 3 வாக்கியங்கள்) இருக்க வேண்டும்.
+Format: {{"verdict": "சூழலுக்கான உங்களின் எளிய, நேரடியான, இயல்பான அறிவுரை", "aram": 40, "porul": 30, "inbam": 30, "kural_number": 1100, "adhigaaram": "அதிகாரத்தின் பெயர்"}}"""
                         lbl_aram, lbl_porul, lbl_inbam = "⚖️ அறம்", "💰 பொருள்", "❤️ அமைதி/இன்பம்"
 
                     response = get_ai_response(prompt)
