@@ -358,7 +358,7 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
             if search_term: st.warning("No related Kural found. / தொடர்புடைய குறள் எதுவும் இல்லை.")
 
 # ==================================================
-# 2. VERDICT (Dynamic UI: ALWAYS SHOW PERCENTAGES)
+# 2. VERDICT (Dynamic UI: STRICT 100% PERCENTAGE SPLIT)
 # ==================================================
 elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI Verdict"]:
     user_input = st.text_input("உங்கள் குழப்பம் / Your Situation (e.g. கடன் வாங்கலாமா ? / Should I take a loan?):")
@@ -371,31 +371,32 @@ elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI
                 try:
                     venba_class = "venba-eng" if lang == "English" else "venba-tamil"
                     
-                    # 🔥 STRICT GUARDRAILS & UNIVERSAL PERCENTAGE FIX (NO MORE TAGS)
+                    # 🔥 AI CONCEPT IMPLEMENTATION: 100% EXACT SPLIT & THIRUKKURAL PHILOSOPHY
                     if lang == "English":
                         prompt = f"""Context: '{user_input}'. Act as Thiruvalluvar. Reply strictly in JSON. 
-ALWAYS score the user's query or intended action independently out of 100 for:
-1. 'aram' (Ethics): How morally right is this? (CRITICAL: 0% for murder, harm, stealing).
-2. 'porul' (Wealth/Practicality): Practical benefit in life.
-3. 'inbam' (Joy): THIRUKKURAL RULE: True joy depends on virtue. If 'aram' is low, 'inbam' MUST be equally low.
-Do not force the sum to 100. Provide scores for ALL queries, even general ones like "love" or "friendship". Do not use tags.
+Analyze the situation and distribute exactly 100% among 'aram', 'porul', and 'inbam' based on Valluvar's philosophy.
+CRITICAL RULE: The sum of aram, porul, and inbam MUST EXACTLY equal 100 (e.g., 50 + 20 + 30 = 100).
+1. 'aram' (Virtue): The ethical weight of the action. (For evil acts like murder/harm, aram = 0).
+2. 'porul' (Wealth/Reality): The material or practical aspect.
+3. 'inbam' (Joy): THIRUKKURAL RULE: True joy depends on virtue. If 'aram' is 0, 'inbam' MUST be 0.
+(Example: For "stealing", Aram=0, Inbam=0, Porul=100 because it's purely materialistic and unethical).
 CRITICAL GUARDRAILS:
 1. DO NOT invent Kurals. Use only real 'kural_number' (1-1330).
 2. 'adhigaaram' MUST exactly match the official chapter name for that Kural.
-3. For money/debt/business queries, MUST use 'Porutpal' kurals.
-Format: {{"verdict": "Short advice", "aram": 0, "porul": 0, "inbam": 0, "kural_number": 120, "adhigaaram": "Chapter Name"}}"""
+Format: {{"verdict": "Short advice", "aram": 40, "porul": 30, "inbam": 30, "kural_number": 120, "adhigaaram": "Chapter Name"}}"""
                         lbl_aram, lbl_porul, lbl_inbam = "⚖️ Virtue", "💰 Wealth", "❤️ Peace/Love"
                     else:
                         prompt = f"""சூழல்: '{user_input}'. நீ திருவள்ளுவர். பதில் JSON-ல் மட்டும்.
-பயனர் கேட்கும் கேள்வி அல்லது செயலை (அது காதல், நட்பு போன்ற பொதுவானதாக இருந்தாலும் சரி) கண்டிப்பாக 0 முதல் 100 வரை தனித்தனியாக மதிப்பிடவும்:
-1. 'aram' (அறம்): இது எவ்வளவு தர்மமானது? (எச்சரிக்கை: கொலை, திருடு போன்ற தீய செயல்களுக்கு 'aram' 0% ஆக இருக்க வேண்டும்).
-2. 'porul' (பொருள்): இதனால் வரும் நடைமுறை பயன்.
-3. 'inbam' (இன்பம்): வள்ளுவர் விதியின்படி அறம் குறைந்தால் இன்பமும் கண்டிப்பாக குறைய வேண்டும்.
-எச்சரிக்கை: மூன்றின் கூட்டுத்தொகை 100 ஆக இருக்க வேண்டியதில்லை. எந்த கேள்வியாக இருந்தாலும் கண்டிப்பாக மூன்று மதிப்பெண்களும் தரப்பட வேண்டும். 'Tags' வேண்டாம்.
+பயனர் கேட்கும் செயலை வள்ளுவரின் பார்வையில் பகுப்பாய்வு செய்து, அதில் அறம், பொருள், இன்பம் ஆகியவை எந்த விகிதத்தில் உள்ளன என 100-ஐப் பிரித்துக் கொடுக்கவும்.
+மிக முக்கியம்: அறம் + பொருள் + இன்பம் ஆகியவற்றின் கூட்டுத்தொகை கண்டிப்பாக 100 ஆக மட்டுமே இருக்க வேண்டும் (எ.கா: 40 + 30 + 30 = 100).
+1. 'aram' (அறம்): செயலின் தர்மம். (கொலை, திருடு போன்ற தீய செயல்களுக்கு அறம் 0 ஆக இருக்க வேண்டும்).
+2. 'porul' (பொருள்): செயலின் உலகியல்/பொருளாதார நோக்கம்.
+3. 'inbam' (இன்பம்): வள்ளுவர் விதியின்படி அறம் இருந்தால்தான் இன்பம் இருக்கும். 'aram' 0 என்றால், 'inbam' கண்டிப்பாக 0 ஆக இருக்க வேண்டும்.
+(எடுத்துக்காட்டு: "திருடலாமா?" என்ற கேள்விக்கு அறம்=0, இன்பம்=0, பொருள்=100 எனப் பிரிக்கலாம். இது முற்றிலும் பொருள் சார்ந்த தீய செயல் என்பதைக் குறிக்கும்).
 முக்கிய கட்டுப்பாடுகள் (CRITICAL GUARDRAILS):
 1. சொந்தமாக குறளை உருவாக்கக் கூடாது. 1 முதல் 1330 வரை உள்ள உண்மையான 'kural_number' மட்டுமே பயன்படுத்தவும்.
 2. 'adhigaaram' பெயர் தேர்ந்தெடுக்கப்பட்ட குறளுக்கு உரியதாக மட்டுமே இருக்க வேண்டும்.
-Format: {{"verdict": "அறிவுரை", "aram": 0, "porul": 0, "inbam": 0, "kural_number": 1100, "adhigaaram": "அதிகாரத்தின் பெயர்"}}"""
+Format: {{"verdict": "அறிவுரை", "aram": 40, "porul": 30, "inbam": 30, "kural_number": 1100, "adhigaaram": "அதிகாரத்தின் பெயர்"}}"""
                         lbl_aram, lbl_porul, lbl_inbam = "⚖️ அறம்", "💰 பொருள்", "❤️ அமைதி/இன்பம்"
 
                     response = model.generate_content(prompt)
@@ -416,7 +417,9 @@ Format: {{"verdict": "அறிவுரை", "aram": 0, "porul": 0, "inbam": 0,
                         else:
                             audio_text = f"Advice: {verdict_text}. "
                             
-                        arm, prl, inb = int(res.get('aram', 33)), int(res.get('porul', 33)), int(res.get('inbam', 34))
+                        # Ensure values are parsed as integers
+                        arm, prl, inb = int(res.get('aram', 34)), int(res.get('porul', 33)), int(res.get('inbam', 33))
+                        
                         dynamic_ui_html = f"""<div class="percentage-container">
 <span class="percentage-item" style="color:#A5D6A7 !important;">{lbl_aram}: {arm}%</span>
 <span class="percentage-item" style="color:#F0C96A !important;">{lbl_porul}: {prl}%</span>
@@ -427,7 +430,7 @@ Format: {{"verdict": "அறிவுரை", "aram": 0, "porul": 0, "inbam": 0,
                         else:
                             audio_text += f" In this, Virtue is {arm} percent, Wealth is {prl} percent, and Joy is {inb} percent."
                         
-                        # Generate Audio with Unique ID based on timestamp to avoid caching old audio
+                        # Generate Audio with Unique ID based on timestamp
                         unique_id = f"audio_verdict_{int(time.time())}"
                         audio_player_html = generate_edge_tts_audio(audio_text, lang, unique_id)
                         
@@ -451,7 +454,6 @@ Format: {{"verdict": "அறிவுரை", "aram": 0, "porul": 0, "inbam": 0,
                 except Exception as e:
                     send_error_alert(f"Verdict Generation Error: {e}")
                     st.error(f"Error: {e}")
-
 # ==================================================
 # 3. AI MENTOR (Untouched as requested)
 # ==================================================
