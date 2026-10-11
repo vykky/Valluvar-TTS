@@ -132,8 +132,103 @@ def inject_custom_css_and_js():
             .modal-bg-close { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; cursor: default; }
 
             /* 🔥 AGGRESSIVE LANGUAGE DROPDOWN FIX 🔥 */
-            /* Force Label Color */
-            div[data-testid="stSelectbox"] label p { color: #F0C
+            div[data-testid="stSelectbox"] label p { color: #F0C96A !important; font-weight: 800 !important; font-size: 16px !important; }
+            div[data-testid="stSelectbox"] div[data-baseweb="select"] > div { background-color: #0D1F3C !important; border: 2px solid rgba(201,168,76,0.5) !important; border-radius: 12px !important; }
+            div[data-testid="stSelectbox"] div[data-baseweb="select"] span { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 800 !important; font-size: 16px !important; }
+            div[data-testid="stSelectbox"] div[data-baseweb="select"] svg { fill: #C9A84C !important; }
+            div[data-baseweb="popover"], div[data-baseweb="popover"] > div, ul[role="listbox"], div[role="listbox"] { background-color: #050D1F !important; }
+            div[data-baseweb="popover"] > div { border: 1px solid #C9A84C !important; box-shadow: 0 8px 32px rgba(0,0,0,0.9) !important; }
+            ul[role="listbox"] li, div[role="listbox"] li { background-color: #050D1F !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 700 !important; font-size: 16px !important; padding: 12px 18px !important; }
+            ul[role="listbox"] li:hover, ul[role="listbox"] li[aria-selected="true"], div[role="listbox"] li:hover { background-color: #152A5A !important; color: #F0C96A !important; -webkit-text-fill-color: #F0C96A !important; font-weight: 800 !important; }
+
+            /* RADIO BUTTONS */
+            div[role="radiogroup"] { background: linear-gradient(145deg, rgba(15,28,58,0.6) 0%, rgba(8,16,38,0.8) 100%); padding: 15px; border-radius: 20px; border: 1px solid rgba(201,168,76,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05); display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+            div[role="radiogroup"] label { background: rgba(255,255,255,0.08) !important; border-radius: 12px !important; border: 1px solid rgba(201,168,76,0.3) !important; padding: 12px 24px !important; cursor: pointer; }
+            div[role="radiogroup"] label p, div[role="radiogroup"] label span, div[role="radiogroup"] label div { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 700 !important; font-size: 15px !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+            div[role="radiogroup"] label[data-checked="true"], div[role="radiogroup"] label:hover { background: linear-gradient(135deg, #152A5A, #0A1835) !important; border-color: #F0C96A !important; box-shadow: 0 8px 20px rgba(10,30,100,0.5) !important; }
+            div[role="radiogroup"] label[data-checked="true"] p { color: #F0C96A !important; -webkit-text-fill-color: #F0C96A !important; }
+
+            /* INPUT TEXT FIXES & AUTOFILL FIX */
+            .stTextInput label p, .stChatInput label p { color: #C9A84C !important; font-size: 15px !important; font-weight: 700 !important; }
+            .stTextInput input, .stChatInput textarea, .stTextArea textarea { background-color: #0D1F3C !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; caret-color: #F0C96A !important; font-weight: 600 !important; border: 1.5px solid rgba(201,168,76,0.5) !important; border-radius: 16px !important; padding: 15px !important; }
+            .stChatInput textarea::placeholder, .stTextInput input::placeholder, .stTextArea textarea::placeholder { color: rgba(255,255,255,0.5) !important; -webkit-text-fill-color: rgba(255,255,255,0.5) !important; }
+            .stTextInput input:-webkit-autofill { -webkit-box-shadow: 0 0 0 30px #0D1F3C inset !important; -webkit-text-fill-color: #FFFFFF !important; transition: background-color 5000s ease-in-out 0s; }
+
+            /* RESULT CARDS FIX */
+            .result-card { background: linear-gradient(145deg, rgba(15,28,58,0.9), rgba(8,16,38,0.95)); border: 1px solid rgba(201,168,76,0.3); border-left: 4px solid #F0C96A; border-radius: 16px; padding: 30px 35px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); margin-bottom: 25px; text-align: left; overflow: hidden; max-width: 100%; }
+            .result-adhigaaram { display: inline-block; background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; padding: 8px 16px; font-size: 14.5px; font-weight: 700; color: #F0C96A !important; margin-bottom: 15px; letter-spacing: 0.5px; }
+            .verdict-text { font-size: 17px !important; color: #FFFFFF !important; line-height: 1.9 !important; margin-top: 10px; }
+            .kural-meaning { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(201,168,76,0.2); font-size: 16.5px; color: rgba(255,255,255,0.9) !important; line-height: 1.9; letter-spacing: 0.3px;}
+            .card-advice, .card-solution, .card-warning { padding: 30px !important; line-height: 1.9; margin-top: 15px; margin-bottom: 25px;}
+            
+            /* STRICT EERADI VENBA ALIGNMENT & SCROLLBAR FIX */
+            .kural-block { margin: 20px 0; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; border-left: 3px solid #C9A84C; width: 100%; box-sizing: border-box; overflow-x: auto !important; display: block; scrollbar-width: thin; scrollbar-color: #F0C96A rgba(255,255,255,0.08); }
+            .kural-block::-webkit-scrollbar { height: 10px !important; display: block !important; -webkit-appearance: none !important; }
+            .kural-block::-webkit-scrollbar-track { background: rgba(255,255,255,0.08) !important; border-radius: 10px !important; visibility: visible !important; }
+            .kural-block::-webkit-scrollbar-thumb { background: linear-gradient(90deg, #F0C96A, #C9A84C) !important; border-radius: 10px !important; border: 2px solid #050D1F !important; visibility: visible !important; }
+            .kural-block::-webkit-scrollbar-thumb:hover { background: #FFFFFF !important; }
+            .kural-line1, .kural-line2 { font-family: 'Noto Serif Tamil', serif; font-weight: 700; color: #FFFFFF !important; line-height: 2.0; margin: 0 !important; padding-right: 25px !important; padding-left: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; width: max-content; text-align: left; }
+            .venba-tamil { display: block; width: max-content; min-width: 100%; margin:0; padding:0; }
+            .venba-tamil .kural-line1, .venba-tamil .kural-line2 { font-size: clamp(14px, 4vw, 22px); white-space: nowrap !important; display: block; }
+            .venba-eng { display: block; width: 100%; }
+            .venba-eng .kural-line1, .venba-eng .kural-line2 { font-size: clamp(14px, 4vw, 20px); white-space: normal !important; word-wrap: break-word !important; }
+            
+            /* PERCENTAGES */
+            .percentage-container { display: flex; flex-wrap: wrap; justify-content: space-around; background: rgba(13,28,56,0.8); border: 1px solid rgba(201,168,76,0.3); border-radius: 16px; padding: 15px; margin-bottom: 20px; }
+            .percentage-item { font-size: 15px; font-weight: 700; margin: 5px; color: #FFFFFF !important; padding: 5px 10px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(201,168,76,0.2);}
+            
+            /* CHAT & BOTTOM BLOCKS */
+            [data-testid="stChatMessage"] { background: linear-gradient(145deg, rgba(15,28,58,0.9), rgba(8,16,38,0.95)) !important; border: 1px solid rgba(201,168,76,0.3) !important; border-radius: 16px !important; padding: 25px !important; box-shadow: 0 8px 25px rgba(0,0,0,0.4) !important; margin-bottom: 30px !important; }
+            [data-testid="stBottom"] { position: static !important; background-color: transparent !important; }
+            [data-testid="stBottomBlock"] { background: transparent !important; border: none !important; padding-bottom: 80px !important; margin-top: 30px;}
+            [data-testid="stBottomBlock"] > div, .stChatInputContainer { background: transparent !important; }
+            .stButton button { background: linear-gradient(135deg, #F0C96A, #C9A84C) !important; color: #050D1F !important; -webkit-text-fill-color: #050D1F !important; font-weight: 800 !important; font-size: 16px !important; border: none !important; border-radius: 12px !important; padding: 10px 25px !important; box-shadow: 0 8px 20px rgba(201,168,76,0.3) !important; width: 100%; }
+            .footer-nav { position: fixed; left: 0; bottom: 0; width: 100%; height: 50px; background: #050D1F; border-top: 1px solid rgba(201,168,76,0.3); color: #C9A84C; text-align: center; display: flex; flex-direction: column; justify-content: center; z-index: 2000;}
+            div.block-container { padding-top: 2rem; padding-bottom: 120px; position: relative; z-index: 10; }
+            
+            /* MOBILE OPTIMIZATION */
+            @media (max-width: 768px) {
+                .modal-box { width: 95%; padding: 20px; }
+                .modal-box h3 { font-size: 18px !important; }
+                .modal-box p, .modal-box span { font-size: 13px !important; }
+                .result-card { padding: 18px 12px; border-radius: 12px; margin-bottom: 20px; overflow: hidden; width: 100%; max-width: 100vw; }
+                div[role="radiogroup"] { padding: 10px; gap: 8px; }
+                div[role="radiogroup"] label { padding: 10px 10px !important; flex-grow: 1; text-align: center; }
+                div[role="radiogroup"] label p, div[role="radiogroup"] label span { font-size: 12px !important; }
+                .kural-block { padding: 12px 10px; width: 100%; box-sizing: border-box; overflow-x: auto !important; overflow-y: hidden; -webkit-overflow-scrolling: touch !important; display: block; }
+                .kural-block::-webkit-scrollbar { display: block !important; height: 6px !important; -webkit-appearance: none !important; }
+                .kural-block::-webkit-scrollbar-track { background: rgba(255,255,255,0.08) !important; visibility: visible !important; }
+                .kural-block::-webkit-scrollbar-thumb { background: #F0C96A !important; border-radius: 10px !important; visibility: visible !important; }
+                .venba-tamil { width: max-content !important; display: block; }
+                .venba-tamil .kural-line1, .venba-tamil .kural-line2 { font-size: clamp(11px, 3.3vw, 16px) !important; letter-spacing: -0.1px !important; white-space: nowrap !important; padding-right: 20px !important; margin: 0 !important; display: block; width: max-content !important; }
+                .stChatInput textarea, .stTextInput input, .stTextArea textarea { font-size: 14px !important; }
+                [data-testid="stChatMessage"] { padding: 15px 12px !important; }
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    components.html("""
+        <script>
+            function initEliteUI() {
+                const doc = window.parent.document;
+                const selectors = ['#MainMenu', 'header', 'footer', '.stDeployButton'];
+                selectors.forEach(s => { const els = doc.querySelectorAll(s); els.forEach(e => e.style.display = 'none'); });
+                
+                doc.querySelectorAll('div[data-baseweb="select"] > div').forEach(el => {
+                    el.style.backgroundColor = '#0D1F3C';
+                    el.style.setProperty("background-color", "#0D1F3C", "important");
+                });
+                doc.querySelectorAll('ul[role="listbox"]').forEach(el => {
+                    el.style.backgroundColor = '#050D1F';
+                    el.style.setProperty("background-color", "#050D1F", "important");
+                });
+            }
+            setInterval(initEliteUI, 100);
+        </script>
+    """, height=0, width=0)
+
+inject_custom_css_and_js()
+st.markdown('<div class="bg-blobs"></div>', unsafe_allow_html=True)
 
 # --- HEADER ---
 st.markdown("""
@@ -186,7 +281,7 @@ with col2:
     lang = st.selectbox("🌐 Select Language / மொழி:", ["தமிழ்", "English"])
 
 # ==========================================
-# 1. SMART API KEY ROTATION SYSTEM (FIXED QUOTA ISSUE)
+# 1. SMART API KEY ROTATION SYSTEM
 # ==========================================
 def get_ai_response(prompt_text):
     key_list = ["key1", "key2", "key3", "key4", "key5"]
@@ -267,7 +362,7 @@ def get_kural_from_local(kural_no, lang_mode):
     if lang_mode == "English":
         return {"line1": "'A' leads letters; the Ancient Lord Leads and lords the entire world", "line2": "", "meaning": "As the letter A is the first of all letters, so the eternal God is first in the world", "number": 1}
     else:
-        return {"line1": "அகர முதல எழுத்தெல்லாம் ஆதி", "line2": "பகவன் முதற்றே உலகு.", "meaning": "எழுத்துக்கள் எல்லாம் அகரத்தை அடிப்படையாக கொண்டிருக்கின்றன. അത്போல உலகம் கடவுளை அடிப்படையாக கொண்டிருக்கிறது.", "number": 1}
+        return {"line1": "அகர முதல எழுத்தெல்லாம் ஆதி", "line2": "பகவன் முதற்றே உலகு.", "meaning": "எழுத்துக்கள் எல்லாம் அகரத்தை அடிப்படையாக கொண்டிருக்கின்றன. அதுபோல உலகம் கடவுளை அடிப்படையாக கொண்டிருக்கிறது.", "number": 1}
 
 def simulate_traffic_control(lang):
     loading_container = st.empty()
@@ -343,7 +438,7 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
             if search_term: st.warning("No related Kural found. / தொடர்புடைய குறள் எதுவும் இல்லை.")
 
 # ==================================================
-# 2. VERDICT (BUG FIXED FOR VOICE LATCHING & SYNTAX ERROR)
+# 2. VERDICT 
 # ==================================================
 elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI Verdict"]:
     
@@ -362,21 +457,24 @@ elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI
     with col2:
         st.markdown("<p style='font-size:13px; color:gray; margin-top: 10px;'><i>(மைக் ஐகானை கிளிக் செய்து பேசவும்)</i></p>", unsafe_allow_html=True)
 
-    if spoken_verdict:
-        st.session_state["verdict_text_area"] = spoken_verdict
+    if "verdict_input_val" not in st.session_state:
+        st.session_state["verdict_input_val"] = ""
 
-    user_input = st.text_area("அல்லது இங்கே தட்டச்சு செய்யவும் / Or type here:", key="verdict_text_area", height=80)
+    if spoken_verdict:
+        st.session_state["verdict_input_val"] = spoken_verdict
+
+    user_input = st.text_area("அல்லது இங்கே தட்டச்சு செய்யவும் / Or type here:", value=st.session_state["verdict_input_val"], height=80)
     
     if st.button(btn_verdict):
         if not user_input: st.warning("Please type or speak your question.")
         else:
+            st.session_state["verdict_input_val"] = "" 
             simulate_traffic_control(lang)
             with st.spinner("📜 Analyzing your situation..."):
                 try:
                     venba_class = "venba-eng" if lang == "English" else "venba-tamil"
                     
                     if lang == "English":
-                        # 🔥 BUG FIX: Removed apostrophes (Valluvar's -> the philosophy of Valluvar) to prevent SyntaxError
                         prompt = f"""Context: {user_input}. Act as Thiruvalluvar. Reply strictly in JSON. 
 Analyze the situation and distribute exactly 100% among aram, porul, and inbam based on the philosophy of Valluvar.
 CRITICAL RULE: The sum of aram, porul, and inbam MUST EXACTLY equal 100 (e.g., 50 + 20 + 30 = 100).
@@ -455,7 +553,7 @@ Format: {{"verdict": "சூழலுக்கான உங்களின் �
                     st.error(f"Error: {e}")
 
 # ==================================================
-# 3. AI MENTOR (BUG FIXED FOR VOICE LATCHING)
+# 3. AI MENTOR 
 # ==================================================
 elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
     init_msg = "உங்களால் தீர்க்க முடியாத மனப்போராட்டங்களைச் சொல்லுங்கள். அதற்கான அறிவுரை, தீர்வு மற்றும் செயல்படாவிடில் வரும் அபாயங்களை அறிந்துகொள்ளுங்கள்..." if lang == "தமிழ்" else "Greetings! I am AI Valluvar. Ask your questions to get wisdom from Thirukkural..."
@@ -497,7 +595,6 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
                  else: st.write(msg["content"])
             else: st.write(msg["content"])
 
-# --- CHAT INPUT & VOICE SECTION ---
     st.markdown("---")
     st.markdown(f"<p style='color:#F0C96A; font-weight:bold; font-size:15px;'>{'🎤 வள்ளுவரிடம் குரல் மூலம் கேட்க:' if lang == 'தமிழ்' else '🎤 Speak to Valluvar:'}</p>", unsafe_allow_html=True)
     
@@ -514,24 +611,20 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
     with col_m2:
         st.markdown("<p style='font-size:13px; color:gray; margin-top: 10px;'><i>(மைக் ஐகானை கிளிக் செய்து பேசவும்)</i></p>", unsafe_allow_html=True)
 
-    # 🔥 BUG FIX: Use a custom state variable instead of directly targeting the widget's key
     if "mentor_input_val" not in st.session_state:
         st.session_state["mentor_input_val"] = ""
 
     if spoken_mentor:
         st.session_state["mentor_input_val"] = spoken_mentor
 
-    # Changed 'key' to 'value' to prevent the Instantiation Error
     prompt_val = st.text_area("கேள்வியை தட்டச்சு செய்யவும் / Type your question:", value=st.session_state["mentor_input_val"], height=80)
 
     if st.button("அனுப்பு / Send", key="send_mentor_btn"):
         if prompt_val:
             st.session_state.messages.append({"role": "user", "content": prompt_val})
-            # Clear text box safely!
             st.session_state["mentor_input_val"] = "" 
             st.rerun()
 
-    # Handle the backend logic if the last message was from the user
     if st.session_state.messages[-1]["role"] == "user":
         prompt_val = st.session_state.messages[-1]["content"]
         with st.chat_message("assistant"):
@@ -542,15 +635,15 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
                     if lang == "English":
                         sys_msg = """Act as Thiruvalluvar. Reply strictly in JSON format.
 CRITICAL GUARDRAILS:
-1. DO NOT invent or hallucinate any Thirukkural. Only select a real 'kural_number' between 1 and 1330.
-2. The 'adhigaaram' MUST exactly match the official Thirukkural chapter name.
+1. DO NOT invent or hallucinate any Thirukkural. Only select a real kural_number between 1 and 1330.
+2. The adhigaaram MUST exactly match the official Thirukkural chapter name.
 3. TONE: Speak like a wise mentor or a caring friend. Use simple, conversational, and practical English. Keep the length medium (2 to 3 sentences).
 Format: { "verdict": "Your actual short, direct advice for the situation", "solution": "Actionable, simple, conversational solution spoken from your perspective", "consequence": "A friendly but firm warning if ignored, in simple words", "kural_number": 120, "adhigaaram": "Exact Chapter Name" }"""
                     else:
                         sys_msg = """நீ திருவள்ளுவர். பதில் JSON வடிவில் மட்டும் தமிழில் இருக்க வேண்டும்.
 முக்கிய கட்டுப்பாடுகள் (CRITICAL GUARDRAILS):
-1. சொந்தமாக திருக்குறளை உருவாக்கக் கூடாது. 1 முதல் 1330 வரை உள்ள உண்மையான குறள் எண்களை ('kural_number') மட்டுமே பயன்படுத்த வேண்டும்.
-2. 'adhigaaram' சரியான அதிகாரத்தின் பெயராக இருக்க வேண்டும்.
+1. சொந்தமாக திருக்குறளை உருவாக்கக் கூடாது. 1 முதல் 1330 வரை உள்ள உண்மையான குறள் எண்களை (kural_number) மட்டுமே பயன்படுத்த வேண்டும்.
+2. adhigaaram சரியான அதிகாரத்தின் பெயராக இருக்க வேண்டும்.
 3. மொழிநடை (TONE): மிகவும் தூய தமிழில் இல்லாமல், ஒரு சக மனிதனிடம் / நண்பனிடம் இயல்பாகப் பேசுவது போல எளிய தமிழில் இருக்க வேண்டும். அளவு நடுத்தரமாக (2 அல்லது 3 வாக்கியங்கள்) இருக்க வேண்டும்.
 Format: { "verdict": "சூழலுக்கான உங்களின் சுருக்கமான, நேரடியான அறிவுரை", "solution": "திருக்குறளை விளக்காமல், நீங்களே நேரில் சொல்வது போன்ற எளிய, நடைமுறை தீர்வு", "consequence": "இதை பின்பற்றாவிட்டால் வரக்கூடிய விளைவுகள் பற்றிய எச்சரிக்கை (எளிய தமிழில்)", "kural_number": 120, "adhigaaram": "சரியான அதிகாரத்தின் பெயர்" }"""
                     
