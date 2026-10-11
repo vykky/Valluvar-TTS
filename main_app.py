@@ -17,6 +17,7 @@ import asyncio
 import edge_tts
 import tempfile
 import base64
+from streamlit_mic_recorder import speech_to_text  # 🔥 NEW: Voice Input Library
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
@@ -134,9 +135,9 @@ def inject_custom_css_and_js():
             div[role="radiogroup"] label[data-checked="true"], div[role="radiogroup"] label:hover { background: linear-gradient(135deg, #152A5A, #0A1835) !important; border-color: #F0C96A !important; box-shadow: 0 8px 20px rgba(10,30,100,0.5) !important; }
             div[role="radiogroup"] label[data-checked="true"] p { color: #F0C96A !important; -webkit-text-fill-color: #F0C96A !important; }
             .stTextInput label p, .stChatInput label p { color: #C9A84C !important; font-size: 15px !important; font-weight: 700 !important; }
-            .stTextInput input, .stChatInput textarea { background-color: #0D1F3C !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; caret-color: #F0C96A !important; font-weight: 600 !important; border: 1.5px solid rgba(201,168,76,0.5) !important; border-radius: 16px !important; padding: 15px !important; }
-            .stChatInput textarea::placeholder, .stTextInput input::placeholder { color: rgba(255,255,255,0.5) !important; -webkit-text-fill-color: rgba(255,255,255,0.5) !important; }
-            .stTextInput input:-webkit-autofill, .stTextInput input:-webkit-autofill:hover, .stTextInput input:-webkit-autofill:focus, .stTextInput input:-webkit-autofill:active { -webkit-box-shadow: 0 0 0 30px #0D1F3C inset !important; -webkit-text-fill-color: #FFFFFF !important; transition: background-color 5000s ease-in-out 0s; }
+            .stTextInput input, .stChatInput textarea, .stTextArea textarea { background-color: #0D1F3C !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; caret-color: #F0C96A !important; font-weight: 600 !important; border: 1.5px solid rgba(201,168,76,0.5) !important; border-radius: 16px !important; padding: 15px !important; }
+            .stChatInput textarea::placeholder, .stTextInput input::placeholder, .stTextArea textarea::placeholder { color: rgba(255,255,255,0.5) !important; -webkit-text-fill-color: rgba(255,255,255,0.5) !important; }
+            .stTextInput input:-webkit-autofill { -webkit-box-shadow: 0 0 0 30px #0D1F3C inset !important; -webkit-text-fill-color: #FFFFFF !important; transition: background-color 5000s ease-in-out 0s; }
             .result-card { background: linear-gradient(145deg, rgba(15,28,58,0.9), rgba(8,16,38,0.95)); border: 1px solid rgba(201,168,76,0.3); border-left: 4px solid #F0C96A; border-radius: 16px; padding: 30px 35px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); margin-bottom: 25px; text-align: left; overflow: hidden; max-width: 100%; }
             .result-adhigaaram { display: inline-block; background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; padding: 8px 16px; font-size: 14.5px; font-weight: 700; color: #F0C96A !important; margin-bottom: 15px; letter-spacing: 0.5px; }
             .verdict-text { font-size: 17px !important; color: #FFFFFF !important; line-height: 1.9 !important; margin-top: 10px; }
@@ -175,7 +176,7 @@ def inject_custom_css_and_js():
                 .kural-block::-webkit-scrollbar-thumb { background: #F0C96A !important; border-radius: 10px !important; visibility: visible !important; }
                 .venba-tamil { width: max-content !important; display: block; }
                 .venba-tamil .kural-line1, .venba-tamil .kural-line2 { font-size: clamp(11px, 3.3vw, 16px) !important; letter-spacing: -0.1px !important; white-space: nowrap !important; padding-right: 20px !important; margin: 0 !important; display: block; width: max-content !important; }
-                .stChatInput textarea, .stTextInput input { font-size: 14px !important; }
+                .stChatInput textarea, .stTextInput input, .stTextArea textarea { font-size: 14px !important; }
                 [data-testid="stChatMessage"] { padding: 15px 12px !important; }
             }
         </style>
@@ -221,14 +222,15 @@ st.markdown("""
 <span style="color: #F0C96A !important; font-weight: bold; font-size: 14px;">✨ Key Features:</span><br>
 <span style="color: #E0E0E0 !important; font-size: 13px;">🌐 Dual Language Support (Tamil/Eng)</span><br>
 <span style="color: #E0E0E0 !important; font-size: 13px;">⚖️ Contextual Life Verdicts</span><br>
-<span style="color: #E0E0E0 !important; font-size: 13px;">🤖 Interactive AI Mentor</span>
+<span style="color: #E0E0E0 !important; font-size: 13px;">🤖 Interactive AI Mentor</span><br>
+<span style="color: #E0E0E0 !important; font-size: 13px;">🎤 Voice Input Support</span>
 </div>
 
 <div style="background: rgba(255,100,100,0.1); border: 1px solid rgba(255,100,100,0.3); border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: left;">
 <span style="color: #FF8A80 !important; font-weight: bold; font-size: 14px;">📌 Important Note:</span><br>
 <p style="color: #E0E0E0 !important; font-size: 12.5px; line-height: 1.6; margin: 8px 0 0 0;">
 <b>1. Scroll to Read:</b> திருக்குறள் வரிகள் நீளமாக இருந்தால், பெட்டியை வலதுபுறம் Scroll / Swipe செய்து முழுமையாக வாசிக்கவும்.<br><br>
-<b>2. 100% Privacy:</b> உங்கள் பெயர், முகவரி, Phone Number, IP Address போன்ற எந்த தனிப்பட்ட தரவுகளும் (Personal Data) எங்களால் சேகரிக்கப்படாது.
+<b>2. 100% Privacy:</b> உங்கள் பெயர், முகவரி, Phone Number, IP Address போன்ற எந்த தனிப்பட்ட தரவுகளும் எங்களால் சேகரிக்கப்படாது.
 </p>
 </div>
 
@@ -251,26 +253,23 @@ with col2:
 # ==========================================
 def get_ai_response(prompt_text):
     key_list = ["key1", "key2", "key3", "key4", "key5"]
-    
-    for key_name in key_list:
-        try:
-            api_key = st.secrets.get(key_name)
-            if not api_key: 
-                continue
-            
-            genai.configure(api_key=api_key)
-            temp_model = genai.GenerativeModel("gemini-2.5-flash")
-            response = temp_model.generate_content(prompt_text)
-            
-            return response
-            
-        except Exception as e:
-            error_str = str(e).lower()
-            if "429" in error_str or "quota" in error_str or "exhausted" in error_str:
-                continue
-            else:
-                continue
-                
+    for attempt in range(2):
+        for key_name in key_list:
+            try:
+                api_key = st.secrets.get(key_name)
+                if not api_key: 
+                    continue
+                genai.configure(api_key=api_key)
+                temp_model = genai.GenerativeModel("gemini-2.5-flash")
+                response = temp_model.generate_content(prompt_text)
+                return response
+            except Exception as e:
+                error_str = str(e).lower()
+                if "429" in error_str or "quota" in error_str or "exhausted" in error_str:
+                    time.sleep(2)
+                    continue
+                else:
+                    continue
     return None
 
 @st.cache_data
@@ -407,19 +406,31 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
             if search_term: st.warning("No related Kural found. / தொடர்புடைய குறள் எதுவும் இல்லை.")
 
 # ==================================================
-# 2. VERDICT (Dynamic UI: STRICT 100% SPLIT & CONVERSATIONAL TONE)
+# 2. VERDICT (Voice Input & Dynamic UI)
 # ==================================================
 elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI Verdict"]:
-    user_input = st.text_input("உங்கள் குழப்பம் / Your Situation (e.g. கடன் வாங்கலாமா ? / Should I take a loan?):")
+    
+    st.markdown(f"<p style='color:#F0C96A; font-weight:bold; font-size:15px;'>{'🎤 உங்கள் குழப்பத்தை குரல் மூலம் கூறுக:' if lang == 'தமிழ்' else '🎤 Speak your situation:'}</p>", unsafe_allow_html=True)
+    
+    # --- VOICE INPUT SECTION ---
+    col1, col2 = st.columns([1, 5])
+    with col1:
+        spoken_verdict = speech_to_text(language='ta-IN' if lang == "தமிழ்" else 'en-US', use_container_width=True, just_once=True, key='STT_verdict')
+    
+    with col2:
+        st.markdown("<p style='font-size:12px; color:gray;'><i>(மைக்கை கிளிக் செய்து பேசவும் / Click mic to speak)</i></p>", unsafe_allow_html=True)
+
+    # --- TEXT INPUT (Auto-fills with Voice) ---
+    user_input = st.text_area("அல்லது இங்கே தட்டச்சு செய்யவும் / Or type here:", value=spoken_verdict if spoken_verdict else "", height=80)
+    
     if st.button(btn_verdict):
-        if not user_input: st.warning("Please type your question.")
+        if not user_input: st.warning("Please type or speak your question.")
         else:
             simulate_traffic_control(lang)
             with st.spinner("📜 Analyzing your situation..."):
                 try:
                     venba_class = "venba-eng" if lang == "English" else "venba-tamil"
                     
-                    # 🔥 AI CONCEPT: 100% EXACT SPLIT & CONVERSATIONAL TONE GUARDRAIL
                     if lang == "English":
                         prompt = f"""Context: '{user_input}'. Act as Thiruvalluvar. Reply strictly in JSON. 
 Analyze the situation and distribute exactly 100% among 'aram', 'porul', and 'inbam' based on Valluvar's philosophy.
@@ -460,12 +471,9 @@ Format: {{"verdict": "சூழலுக்கான உங்களின் �
                         ai_chap = res.get('adhigaaram', 'அதிகாரம்')
                         
                         dynamic_ui_html = ""
-                        
                         verdict_text = res.get('verdict', '')
-                        if lang == "தமிழ்":
-                            audio_text = f"அறிவுரை: {verdict_text}. "
-                        else:
-                            audio_text = f"Advice: {verdict_text}. "
+                        if lang == "தமிழ்": audio_text = f"அறிவுரை: {verdict_text}. "
+                        else: audio_text = f"Advice: {verdict_text}. "
                             
                         arm, prl, inb = int(res.get('aram', 34)), int(res.get('porul', 33)), int(res.get('inbam', 33))
                         
@@ -474,10 +482,8 @@ Format: {{"verdict": "சூழலுக்கான உங்களின் �
 <span class="percentage-item" style="color:#F0C96A !important;">{lbl_porul}: {prl}%</span>
 <span class="percentage-item" style="color:#FF8A80 !important;">{lbl_inbam}: {inb}%</span>
 </div>"""
-                        if lang == "தமிழ்":
-                            audio_text += f" இதில், அறம் {arm} சதவிகிதம், பொருள் {prl} சதவிகிதம், இன்பம் {inb} சதவிகிதம் உள்ளது."
-                        else:
-                            audio_text += f" In this, Virtue is {arm} percent, Wealth is {prl} percent, and Joy is {inb} percent."
+                        if lang == "தமிழ்": audio_text += f" இதில், அறம் {arm} சதவிகிதம், பொருள் {prl} சதவிகிதம், இன்பம் {inb} சதவிகிதம் உள்ளது."
+                        else: audio_text += f" In this, Virtue is {arm} percent, Wealth is {prl} percent, and Joy is {inb} percent."
                         
                         unique_id = f"audio_verdict_{int(time.time())}"
                         audio_player_html = generate_edge_tts_audio(audio_text, lang, unique_id)
@@ -504,7 +510,7 @@ Format: {{"verdict": "சூழலுக்கான உங்களின் �
                     st.error(f"Error: {e}")
 
 # ==================================================
-# 3. AI MENTOR 
+# 3. AI MENTOR (Voice Input & Chat UI)
 # ==================================================
 elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
     init_msg = "உங்களால் தீர்க்க முடியாத மனப்போராட்டங்களைச் சொல்லுங்கள். அதற்கான அறிவுரை, தீர்வு மற்றும் செயல்படாவிடில் வரும் அபாயங்களை அறிந்துகொள்ளுங்கள்..." if lang == "தமிழ்" else "Greetings! I am AI Valluvar. Ask your questions to get wisdom from Thirukkural..."
@@ -512,6 +518,7 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
     if "messages" not in st.session_state:
         st.session_state.messages = [{"role": "assistant", "content": init_msg, "kural_data": None, "audio_html": ""}]
 
+    # Display Chat History with Audio Embedded
     for msg in st.session_state.messages:
         role = "assistant" if msg["role"] == "assistant" else "user"
         with st.chat_message(role):
@@ -546,10 +553,27 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
                  else: st.write(msg["content"])
             else: st.write(msg["content"])
 
-    if prompt := st.chat_input("Ask Valluvar... / வள்ளுவரிடம் கேட்க..."):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"): st.write(prompt)
+    # --- CHAT INPUT & VOICE SECTION ---
+    st.markdown("---")
+    st.markdown(f"<p style='color:#F0C96A; font-weight:bold; font-size:15px;'>{'🎤 வள்ளுவரிடம் குரல் மூலம் கேட்க:' if lang == 'தமிழ்' else '🎤 Speak to Valluvar:'}</p>", unsafe_allow_html=True)
+    
+    col_m1, col_m2 = st.columns([1, 5])
+    with col_m1:
+        spoken_mentor = speech_to_text(language='ta-IN' if lang == "தமிழ்" else 'en-US', use_container_width=True, just_once=True, key='STT_mentor')
+    with col_m2:
+        st.markdown("<p style='font-size:12px; color:gray;'><i>(மைக்கை கிளிக் செய்து பேசவும் / Click mic to speak)</i></p>", unsafe_allow_html=True)
 
+    # Replacing st.chat_input with st.text_area so voice text can auto-fill
+    prompt = st.text_area("கேள்வியை தட்டச்சு செய்யவும் / Type your question:", value=spoken_mentor if spoken_mentor else "", height=80)
+
+    if st.button("அனுப்பு / Send", key="send_mentor_btn"):
+        if prompt:
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            st.rerun() # Forces rerun to show user message instantly like a real chat
+
+    # Handle the backend logic if the last message was from the user
+    if st.session_state.messages[-1]["role"] == "user":
+        prompt_val = st.session_state.messages[-1]["content"]
         with st.chat_message("assistant"):
             with st.spinner("📜 வள்ளுவர் is thinking..."):
                 try:
@@ -570,7 +594,7 @@ Format: { "verdict": "Your actual short, direct advice for the situation", "solu
 3. மொழிநடை (TONE): மிகவும் தூய தமிழில் இல்லாமல், ஒரு சக மனிதனிடம் / நண்பனிடம் இயல்பாகப் பேசுவது போல எளிய தமிழில் இருக்க வேண்டும். அளவு நடுத்தரமாக (2 அல்லது 3 வாக்கியங்கள்) இருக்க வேண்டும்.
 Format: { "verdict": "சூழலுக்கான உங்களின் சுருக்கமான, நேரடியான அறிவுரை", "solution": "திருக்குறளை விளக்காமல், நீங்களே நேரில் சொல்வது போன்ற எளிய, நடைமுறை தீர்வு", "consequence": "இதை பின்பற்றாவிட்டால் வரக்கூடிய விளைவுகள் பற்றிய எச்சரிக்கை (எளிய தமிழில்)", "kural_number": 120, "adhigaaram": "சரியான அதிகாரத்தின் பெயர்" }"""
                     
-                    response = get_ai_response(sys_msg + "\n\nQuestion/கேள்வி: " + prompt)
+                    response = get_ai_response(sys_msg + "\n\nQuestion/கேள்வி: " + prompt_val)
                     
                     if response:
                         r = extract_json_from_text(response.text)
@@ -578,7 +602,7 @@ Format: { "verdict": "சூழலுக்கான உங்களின் �
                         r = None
                     
                     if r:
-                        log_to_gsheets("Chat Mode", prompt, r.get('verdict', ''))
+                        log_to_gsheets("Chat Mode", prompt_val, r.get('verdict', ''))
                         local_data = get_kural_from_local(r.get('kural_number', 1), lang)
                         kural_line2_html = f'<div class="kural-line2">{local_data["line2"]}</div>' if local_data["line2"] else ''
                         ai_chap = r.get('adhigaaram', 'அதிகாரம்')
