@@ -298,8 +298,7 @@ def get_working_model():
                             selected_model = m
                             break
                     clean_name = selected_model.replace("models/", "")
-                    # அதிவேகமாக செயல்பட நேரடியாக மாடலை செட் செய்வது
-                return genai.GenerativeModel("gemini-1.5-flash-8b") # அல்லது "gemini-1.5-flash"
+                    return genai.GenerativeModel(clean_name)
                     
         except Exception:
             pass 
@@ -461,17 +460,15 @@ if master_mode == "📝 எழுத்து முறை (Text Interface)":
 
     # --- VERDICT MODE WITH INLINE VOICE TYPING ---
     elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI Verdict"]:
-        # 1. State Variables Initialization
-        if "v_text_val" not in st.session_state: st.session_state.v_text_val = ""
-        if "v_text_key" not in st.session_state: st.session_state.v_text_key = 0
+        if "v_prompt" not in st.session_state: st.session_state.v_prompt = ""
         if "last_v_mic" not in st.session_state: st.session_state.last_v_mic = None
         
         st.markdown(f"<h4 style='color: #F0C96A; font-size: 15px;'>உங்கள் குழப்பம் / Your Situation:</h4>", unsafe_allow_html=True)
         
         v_col1, v_col2, v_col3 = st.columns([7.0, 1.5, 1.5])
         with v_col1:
-            # 🔥 Dynamic Key - v_text_key மாறும்போதெல்லாம் பாக்ஸ் ரெஃப்ரெஷ் ஆகும்
-            v_input = st.text_input("Situation", value=st.session_state.v_text_val, key=f"v_txt_{st.session_state.v_text_key}", label_visibility="collapsed", placeholder="e.g. கடன் வாங்கலாமா ? / Should I take a loan?")
+            # Removed the exact key link to avoid Streamlit modification error
+            v_input = st.text_input("Situation", value=st.session_state.v_prompt, key="v_txt_widget", label_visibility="collapsed", placeholder="e.g. கடன் வாங்கலாமா ? / Should I take a loan?")
         with v_col2:
             v_mic = audio_recorder(text="", recording_color="#FF8A80", neutral_color="#F0C96A", icon_name="microphone", icon_size="2x", key="v_mic_rec")
         with v_col3:
@@ -487,18 +484,19 @@ if master_mode == "📝 எழுத்து முறை (Text Interface)":
                         rec_lang = 'ta-IN' if lang == "தமிழ்" else 'en-IN'
                         transcribed = r.recognize_google(audio_data, language=rec_lang)
                         
-                        st.session_state.v_text_val = transcribed
-                        st.session_state.v_text_key += 1 # 🔥 இந்த வரிதான் டெக்ஸ்டை ஸ்க்ரீனுக்குக் கொண்டு வரும்
+                        st.session_state.v_prompt = transcribed
                         st.rerun()
                 except sr.UnknownValueError:
                     st.error("குரல் தெளிவாக இல்லை, மீண்டும் பேசவும்.")
-                except Exception:
+                except Exception as e:
                     pass
             
+        if v_input != st.session_state.v_prompt:
+            st.session_state.v_prompt = v_input
+            
         if verdict_btn_click:
-            user_input = v_input # நேரடியாக விக்ஜெட் வேல்யூவை எடுக்கிறோம்
+            user_input = st.session_state.v_prompt
             if not user_input: st.warning("Please type or speak your question.")
-            # ... (இதற்கு கீழ் பழையபடி "elif not model:" கோடு தொடரலாம்) ...
             elif not model: st.error("No AI Connection.")
             else:
                 simulate_traffic_control(lang)
@@ -680,16 +678,15 @@ if master_mode == "📝 எழுத்து முறை (Text Interface)":
                             send_error_alert(f"AI Mentor Generation Error: {e}")
                             st.error(f"Error: {e}")
                             
-       # INLINE CHAT INPUT WITH VOICE TYPING
-        if "c_text_val" not in st.session_state: st.session_state.c_text_val = ""
-        if "c_text_key" not in st.session_state: st.session_state.c_text_key = 100
+        # INLINE CHAT INPUT WITH VOICE TYPING
+        if "c_prompt" not in st.session_state: st.session_state.c_prompt = ""
         if "last_c_mic" not in st.session_state: st.session_state.last_c_mic = None
         
         st.markdown("<br>", unsafe_allow_html=True)
         
         c_col1, c_col2, c_col3 = st.columns([7.0, 1.5, 1.5])
         with c_col1:
-            c_input = st.text_input("Ask", value=st.session_state.c_text_val, key=f"c_txt_{st.session_state.c_text_key}", label_visibility="collapsed", placeholder="வள்ளுவரிடம் கேட்க... / Ask Valluvar...")
+            c_input = st.text_input("Ask", value=st.session_state.c_prompt, key="c_txt_widget", label_visibility="collapsed", placeholder="வள்ளுவரிடம் கேட்க... / Ask Valluvar...")
         with c_col2:
             c_mic = audio_recorder(text="", recording_color="#FF8A80", neutral_color="#F0C96A", icon_name="microphone", icon_size="2x", key="c_mic_rec")
         with c_col3:
@@ -706,18 +703,19 @@ if master_mode == "📝 எழுத்து முறை (Text Interface)":
                         rec_lang = 'ta-IN' if lang == "தமிழ்" else 'en-IN'
                         transcribed = r.recognize_google(audio_data, language=rec_lang)
                         
-                        st.session_state.c_text_val = transcribed
-                        st.session_state.c_text_key += 1
+                        st.session_state.c_prompt = transcribed
                         st.rerun()
                 except sr.UnknownValueError:
                     st.error("குரல் தெளிவாக இல்லை, மீண்டும் பேசவும்.")
-                except Exception:
+                except Exception as e:
                     pass
                 
-        if send_btn and c_input:
-            st.session_state.pending_chat_prompt = c_input
-            st.session_state.c_text_val = "" 
-            st.session_state.c_text_key += 1 # செண்ட் கொடுத்தவுடன் பாக்ஸை காலி செய்ய
+        if c_input != st.session_state.c_prompt:
+            st.session_state.c_prompt = c_input
+            
+        if send_btn and st.session_state.c_prompt:
+            st.session_state.pending_chat_prompt = st.session_state.c_prompt
+            st.session_state.c_prompt = "" 
             st.rerun()
 
 # --------------------------------------------------
@@ -760,37 +758,11 @@ elif master_mode == "🎙️ வள்ளுவர் லைவ் (Voice Interf
                 user_speech_text = None
 
         if user_speech_text and model:
-            
-            # 1. ஃபேக்ட்ஸ் பட்டியல் (Facts List)
-            thirukkural_facts = [
-                "உங்களுக்குத் தெரியுமா? திருக்குறளில் 'தமிழ்' என்ற வார்த்தை ஒரு இடத்தில்கூட இடம்பெறவில்லை!",
-                "உங்களுக்குத் தெரியுமா? திருக்குறள் அகரத்தில் (அ) தொடங்கி னகரத்தில் (ன்) முடிகிறது.",
-                "உங்களுக்குத் தெரியுமா? திருக்குறளில் பயன்படுத்தப்படாத ஒரே எண் 'ஒன்பது' (9).",
-                "உங்களுக்குத் தெரியுமா? திருக்குறளில் இடம்பெற்ற ஒரே பழம் 'நெருஞ்சிப்பழம்', விதை 'குன்றிமணி'.",
-                "உங்களுக்குத் தெரியுமா? திருக்குறளில் அதிகம் பயன்படுத்தப்பட்ட ஓர் எழுத்து 'னி' (1705 முறை)."
-            ]
-            
-            # 2. ரேண்டமாக ஒரு தகவலை எடுப்பது
-            import random
-            selected_fact = random.choice(thirukkural_facts)
-            
-            # 3. திரையில் ஒரு அழகான பாக்ஸில் காட்டுவது
-            fact_placeholder = st.empty()
-            fact_placeholder.markdown(f"""
-            <div style="background: rgba(201,168,76,0.1); border-left: 4px solid #F0C96A; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <span style="color: #F0C96A; font-weight: bold;">💡 சுவாரஸ்யமான தகவல்:</span><br>
-                <span style="color: #FFFFFF; font-size: 14px;">{selected_fact}</span>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            with st.spinner("📜 வள்ளுவர் உங்கள் உணர்வுகளைப் பகுப்பாய்வு செய்கிறார்..."):
+            with st.spinner("📜 வள்ளுவர் சிந்திக்கிறார்..."):
                 try:
-                    # (இதற்கு கீழ் உங்களின் பழைய LLM API Call லாஜிக் அப்படியே வரும்)
-                    # முந்தைய உரையாடல்களை மெமரியில் சேர்ப்பது...
-                    # response = model.generate_content(...)
                     # முந்தைய உரையாடல்களை மெமரியில் சேர்ப்பது
                     st.session_state.voice_history.append(f"User: {user_speech_text}")
-                    if len(st.session_state.voice_history) > 2: # 5-ல் இருந்து 2 ஆக குறைக்கப்பட்டுள்ளது
+                    if len(st.session_state.voice_history) > 5: # கடைசி 5 உரையாடல்களை மட்டும் நியாபகம் வைத்துக்கொள்ளும்
                         st.session_state.voice_history.pop(0)
                         
                     context_string = "\n".join(st.session_state.voice_history)
@@ -820,13 +792,9 @@ elif master_mode == "🎙️ வள்ளுவர் லைவ் (Voice Interf
                         # ஏஐயின் பதிலையும் மெமரியில் சேர்ப்பது
                         st.session_state.voice_history.append(f"Valluvar: {res_json.get('audio_script', '')}")
                         
-                        # --- இந்த நேர்கோட்டில் சரியாக அமைய வேண்டும் ---
                         final_speech_text = res_json.get('audio_script', '')
                         
-                        # ஆடியோ ஜெனரேட் ஆகும் முன்பே டெக்ஸ்டைக் காட்டுவது
-                        st.markdown(f"<div class='result-card card-advice' style='margin-bottom: 15px;'><div class='result-adhigaaram'>🗣️ வள்ளுவர்:</div><div class='verdict-text'>{final_speech_text}</div></div>", unsafe_allow_html=True)
-                        
-                        # UI Logic: புதிய குறள் என்றால் மட்டும் ஸ்க்ரீனில் திருக்குறளைக் காட்டும்...
+                        # UI Logic: புதிய குறள் என்றால் மட்டும் ஸ்க்ரீனில் திருக்குறளைக் காட்டும், இல்லையென்றால் உரையாடலாகவே தொடரும்.
                         if res_json.get('type') == "new_kural":
                             local_data = get_kural_from_local(res_json.get('kural_number', 1), lang)
                             kural_line2_html = f'<div class="kural-line2">{local_data["line2"]}</div>' if local_data["line2"] else ''
