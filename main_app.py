@@ -820,12 +820,13 @@ elif master_mode == "🎙️ வள்ளுவர் லைவ் (Voice Interf
                         # ஏஐயின் பதிலையும் மெமரியில் சேர்ப்பது
                         st.session_state.voice_history.append(f"Valluvar: {res_json.get('audio_script', '')}")
                         
-                       final_speech_text = res_json.get('audio_script', '')
+                        # --- இந்த நேர்கோட்டில் சரியாக அமைய வேண்டும் ---
+                        final_speech_text = res_json.get('audio_script', '')
                         
-                        # 🌟 ஆடியோ ஜெனரேட் ஆகும் முன்பே பதிலை ஸ்க்ரீனில் காட்டுவதற்கான கோடு
+                        # ஆடியோ ஜெனரேட் ஆகும் முன்பே டெக்ஸ்டைக் காட்டுவது
                         st.markdown(f"<div class='result-card card-advice' style='margin-bottom: 15px;'><div class='result-adhigaaram'>🗣️ வள்ளுவர்:</div><div class='verdict-text'>{final_speech_text}</div></div>", unsafe_allow_html=True)
                         
-                        # UI Logic: புதிய குறள் என்றால் மட்டும் ஸ்க்ரீனில் திருக்குறளைக் காட்டும், இல்லையென்றால் உரையாடலாகவே தொடரும்.
+                        # UI Logic: புதிய குறள் என்றால் மட்டும் ஸ்க்ரீனில் திருக்குறளைக் காட்டும்...
                         if res_json.get('type') == "new_kural":
                             local_data = get_kural_from_local(res_json.get('kural_number', 1), lang)
                             kural_line2_html = f'<div class="kural-line2">{local_data["line2"]}</div>' if local_data["line2"] else ''
