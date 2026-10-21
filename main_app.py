@@ -18,6 +18,9 @@ import edge_tts
 import tempfile
 import base64
 from streamlit_mic_recorder import speech_to_text
+from gtts import gTTS
+import io
+import speech_recognition as sr
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
@@ -32,7 +35,6 @@ st.set_page_config(
 # ==========================================
 def generate_edge_tts_audio(text_to_read, lang_code, unique_id):
     try:
-        # டெக்ஸ்ட் காலியாக இருக்கிறதா எனச் சரிபார்க்க
         if not text_to_read or not text_to_read.strip():
             return ""
 
@@ -47,7 +49,6 @@ def generate_edge_tts_audio(text_to_read, lang_code, unique_id):
             
         temp_audio_path = asyncio.run(amain())
         
-        # ஆடியோ ஃபைல் வெற்றிகரமாக உருவானதா எனச் சரிபார்க்க
         if os.path.exists(temp_audio_path) and os.path.getsize(temp_audio_path) > 0:
             with open(temp_audio_path, "rb") as audio_file:
                 audio_bytes = audio_file.read()
@@ -69,14 +70,12 @@ def generate_edge_tts_audio(text_to_read, lang_code, unique_id):
                 audio_bytes = audio_file.read()
             os.remove(temp_audio_path)
         except Exception as backup_error:
-            return f"<p style='color:#FF8A80; font-size:12px;'>Audio generation failed: {edge_error}</p>"
+            return f"<p style='color:#FF8A80; font-size:12px;'>Audio generation failed.</p>"
 
-    # ஆடியோவை Base64 ஆக மாற்றி HTML-ல் கொடுப்பது
+    # ஆடியோவை Base64 ஆக மாற்றி HTML-ல் கொடுப்பது (Autoplay சேர்க்கப்பட்டுள்ளது)
     b64 = base64.b64encode(audio_bytes).decode()
     audio_html = f'<audio id="{unique_id}" controls autoplay style="width: 100%; height: 40px; margin-top: 15px; border-radius: 8px; outline: none;"><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>'
     return audio_html
-    except Exception as e:
-        return f"<p style='color:#FF8A80; font-size:12px;'>Audio generation error: {e}</p>"
 
 # ==========================================
 # 💾 DATA LOGGING SYSTEM (GOOGLE SHEETS)
@@ -208,12 +207,6 @@ def inject_custom_css_and_js():
             .stButton button { background: linear-gradient(135deg, #F0C96A, #C9A84C) !important; color: #050D1F !important; -webkit-text-fill-color: #050D1F !important; font-weight: 800 !important; font-size: 16px !important; border: none !important; border-radius: 12px !important; padding: 10px 25px !important; box-shadow: 0 8px 20px rgba(201,168,76,0.3) !important; width: 100%; }
             .footer-nav { position: fixed; left: 0; bottom: 0; width: 100%; height: 50px; background: #050D1F; border-top: 1px solid rgba(201,168,76,0.3); color: #C9A84C; text-align: center; display: flex; flex-direction: column; justify-content: center; z-index: 2000;}
             div.block-container { padding-top: 2rem; padding-bottom: 120px; position: relative; z-index: 10; }
-            
-            /* 🎙 INLINE MIC FIXES */
-            [data-testid="stIFrame"], [data-testid="stIFrame"] iframe { background-color: transparent !important; border: none !important; }
-            iframe[title="audio_recorder_streamlit.audio_recorder"] { border-radius: 50% !important; margin: 0 auto !important; display: block; }
-            div[data-testid="stHorizontalBlock"] { align-items: end !important; } 
-            .stButton button { margin-bottom: 2px !important; }
 
             @media (max-width: 768px) {
                 .modal-box { width: 95%; padding: 20px; }
@@ -324,10 +317,10 @@ def get_rotating_facts_html():
             padding: 15px 20px; 
             border-radius: 8px; 
             box-sizing: border-box;
-            height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            min-height: 100px;
         }
         .title { color: #F0C96A; font-weight: bold; font-size: 15px; margin-bottom: 8px; }
         .content { color: #FFFFFF; font-size: 14.5px; line-height: 1.6; transition: opacity 0.5s ease-in-out; }
@@ -353,14 +346,16 @@ def get_rotating_facts_html():
         ];
         let idx = 0;
         const textEl = document.getElementById('fact-text');
+        
+        // 3 விநாடிகளுக்கு ஒருமுறை தகவல் மாறும்
         setInterval(() => {
             textEl.style.opacity = 0;
             setTimeout(() => {
                 idx = (idx + 1) % facts.length;
                 textEl.innerText = facts[idx];
                 textEl.style.opacity = 1;
-            }, 500); // Wait for fade out
-        }, 3500); // Change fact every 3.5 seconds
+            }, 500); 
+        }, 3000); 
     </script>
     </body>
     </html>
@@ -557,7 +552,7 @@ elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI
             st.session_state["verdict_input_val"] = "" 
             simulate_traffic_control(lang)
             
-            # --- 🌟 திருக்குறள் ஃபேக்ட்ஸ் லோடிங் அனிமேஷன் (Rotating Facts) 🌟 ---
+            # --- 🌟 Rotating Facts Loading Animation 🌟 ---
             fact_placeholder = st.empty()
             with fact_placeholder:
                 components.html(get_rotating_facts_html(), height=120)
@@ -600,7 +595,7 @@ Format: {{"verdict": "சூழலுக்கான உங்களின் �
                         res = None
                     
                     if res:
-                        # 🌟 AI பதில் வந்தவுடன் Rotating Facts-ஐ மறைத்துவிடலாம் 🌟
+                        # 🌟 AI பதில் வந்தவுடன் Facts பாக்ஸை அழித்துவிடலாம் 🌟
                         fact_placeholder.empty()
 
                         log_to_gsheets("Decision Mode", user_input, res.get('verdict', ''))
@@ -726,7 +721,7 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
         prompt_val = st.session_state.messages[-1]["content"]
         with st.chat_message("assistant"):
             
-            # --- 🌟 திருக்குறள் ஃபேக்ட்ஸ் லோடிங் அனிமேஷன் (Rotating Facts) 🌟 ---
+            # --- 🌟 Rotating Facts Loading Animation 🌟 ---
             fact_placeholder = st.empty()
             with fact_placeholder:
                 components.html(get_rotating_facts_html(), height=120)
@@ -758,7 +753,7 @@ Format: { "verdict": "சூழலுக்கான உங்களின் �
                         r = None
                     
                     if r:
-                        # 🌟 AI பதில் வந்தவுடன் Rotating Facts-ஐ மறைத்துவிடலாம் 🌟
+                        # 🌟 AI பதில் வந்தவுடன் Facts பாக்ஸை அழித்துவிடலாம் 🌟
                         fact_placeholder.empty()
 
                         log_to_gsheets("Chat Mode", prompt_val, r.get('verdict', ''))
