@@ -186,7 +186,12 @@ def inject_custom_css_and_js():
             .footer-nav { position: fixed; left: 0; bottom: 0; width: 100%; height: 50px; background: #050D1F; border-top: 1px solid rgba(201,168,76,0.3); color: #C9A84C; text-align: center; display: flex; flex-direction: column; justify-content: center; z-index: 2000;}
             div.block-container { padding-top: 2rem; padding-bottom: 120px; position: relative; z-index: 10; }
             
-            /* MOBILE OPTIMIZATION */
+            /* 🎙 INLINE MIC FIXES */
+            [data-testid="stIFrame"], [data-testid="stIFrame"] iframe { background-color: transparent !important; border: none !important; }
+            iframe[title="audio_recorder_streamlit.audio_recorder"] { border-radius: 50% !important; margin: 0 auto !important; display: block; }
+            div[data-testid="stHorizontalBlock"] { align-items: end !important; } 
+            .stButton button { margin-bottom: 2px !important; }
+
             @media (max-width: 768px) {
                 .modal-box { width: 95%; padding: 20px; }
                 .modal-box h3 { font-size: 18px !important; }
@@ -206,7 +211,6 @@ def inject_custom_css_and_js():
             }
         </style>
     """, unsafe_allow_html=True)
-
     components.html("""
         <script>
             function initEliteUI() {
@@ -470,6 +474,24 @@ elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI
         else:
             st.session_state["verdict_input_val"] = "" 
             simulate_traffic_control(lang)
+            
+            # --- திருக்குறள் ஃபேக்ட்ஸ் லோடிங் ஸ்க்ரீன் ---
+            thirukkural_facts = [
+                "உங்களுக்குத் தெரியுமா? திருக்குறளில் 'தமிழ்' என்ற வார்த்தை ஒரு இடத்தில்கூட இடம்பெறவில்லை!",
+                "உங்களுக்குத் தெரியுமா? திருக்குறள் அகரத்தில் (அ) தொடங்கி னகரத்தில் (ன்) முடிகிறது.",
+                "உங்களுக்குத் தெரியுமா? திருக்குறளில் பயன்படுத்தப்படாத ஒரே எண் 'ஒன்பது' (9).",
+                "உங்களுக்குத் தெரியுமா? திருக்குறளில் இடம்பெற்ற ஒரே பழம் 'நெருஞ்சிப்பழம்', விதை 'குன்றிமணி'.",
+                "உங்களுக்குத் தெரியுமா? திருக்குறளில் அதிகம் பயன்படுத்தப்பட்ட ஓர் எழுத்து 'னி' (1705 முறை)."
+            ]
+            selected_fact = random.choice(thirukkural_facts)
+            fact_placeholder = st.empty()
+            fact_placeholder.markdown(f"""
+            <div style="background: rgba(201,168,76,0.1); border-left: 4px solid #F0C96A; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <span style="color: #F0C96A; font-weight: bold;">💡 சுவாரஸ்யமான தகவல்:</span><br>
+                <span style="color: #FFFFFF; font-size: 14px;">{selected_fact}</span>
+            </div>
+            """, unsafe_allow_html=True)
+
             with st.spinner("📜 Analyzing your situation..."):
                 try:
                     venba_class = "venba-eng" if lang == "English" else "venba-tamil"
@@ -508,6 +530,9 @@ Format: {{"verdict": "சூழலுக்கான உங்களின் �
                         res = None
                     
                     if res:
+                        # Facts-ஐ மறைத்துவிட்டு பதிலை காட்ட
+                        fact_placeholder.empty()
+
                         log_to_gsheets("Decision Mode", user_input, res.get('verdict', ''))
                         local_data = get_kural_from_local(res.get('kural_number', 1), lang)
                         kural_line2_html = f'<div class="kural-line2">{local_data["line2"]}</div>' if local_data["line2"] else ''
@@ -547,8 +572,10 @@ Format: {{"verdict": "சூழலுக்கான உங்களின் �
 </div>
 """, unsafe_allow_html=True)
                     else:
+                        fact_placeholder.empty()
                         st.error("AI Output Error or Quota Exhausted on all keys.")
                 except Exception as e:
+                    fact_placeholder.empty()
                     send_error_alert(f"Verdict Generation Error: {e}")
                     st.error(f"Error: {e}")
 
@@ -628,6 +655,24 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
     if st.session_state.messages[-1]["role"] == "user":
         prompt_val = st.session_state.messages[-1]["content"]
         with st.chat_message("assistant"):
+            
+            # --- திருக்குறள் ஃபேக்ட்ஸ் லோடிங் ஸ்க்ரீன் ---
+            thirukkural_facts = [
+                "உங்களுக்குத் தெரியுமா? திருக்குறளில் 'தமிழ்' என்ற வார்த்தை ஒரு இடத்தில்கூட இடம்பெறவில்லை!",
+                "உங்களுக்குத் தெரியுமா? திருக்குறள் அகரத்தில் (அ) தொடங்கி னகரத்தில் (ன்) முடிகிறது.",
+                "உங்களுக்குத் தெரியுமா? திருக்குறளில் பயன்படுத்தப்படாத ஒரே எண் 'ஒன்பது' (9).",
+                "உங்களுக்குத் தெரியுமா? திருக்குறளில் இடம்பெற்ற ஒரே பழம் 'நெருஞ்சிப்பழம்', விதை 'குன்றிமணி'.",
+                "உங்களுக்குத் தெரியுமா? திருக்குறளில் அதிகம் பயன்படுத்தப்பட்ட ஓர் எழுத்து 'னி' (1705 முறை)."
+            ]
+            selected_fact = random.choice(thirukkural_facts)
+            fact_placeholder = st.empty()
+            fact_placeholder.markdown(f"""
+            <div style="background: rgba(201,168,76,0.1); border-left: 4px solid #F0C96A; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <span style="color: #F0C96A; font-weight: bold;">💡 சுவாரஸ்யமான தகவல்:</span><br>
+                <span style="color: #FFFFFF; font-size: 14px;">{selected_fact}</span>
+            </div>
+            """, unsafe_allow_html=True)
+
             with st.spinner("📜 வள்ளுவர் is thinking..."):
                 try:
                     venba_class = "venba-eng" if lang == "English" else "venba-tamil"
@@ -655,6 +700,9 @@ Format: { "verdict": "சூழலுக்கான உங்களின் �
                         r = None
                     
                     if r:
+                        # Facts-ஐ மறைத்துவிட்டு பதிலை காட்ட
+                        fact_placeholder.empty()
+
                         log_to_gsheets("Chat Mode", prompt_val, r.get('verdict', ''))
                         local_data = get_kural_from_local(r.get('kural_number', 1), lang)
                         kural_line2_html = f'<div class="kural-line2">{local_data["line2"]}</div>' if local_data["line2"] else ''
@@ -697,10 +745,12 @@ Format: { "verdict": "சூழலுக்கான உங்களின் �
 """, unsafe_allow_html=True)
                         st.session_state.messages.append({"role": "assistant", "content": response.text, "kural_data": local_data, "audio_html": audio_player_html})
                     else:
+                        fact_placeholder.empty()
                         error_text = "AI Output Error or Quota Exhausted on all keys."
                         st.write(error_text)
                         st.session_state.messages.append({"role": "assistant", "content": error_text, "audio_html": ""})
                 except Exception as e:
+                    fact_placeholder.empty()
                     send_error_alert(f"AI Mentor Generation Error: {e}")
                     st.error(f"Error: {e}")
 
