@@ -285,6 +285,65 @@ with col2:
     lang = st.selectbox("🌐 Select Language / மொழி:", ["தமிழ்", "English"])
 
 # ==========================================
+# 🔥 ROTATING FACTS HTML COMPONENT (10 Facts SlideShow)
+# ==========================================
+def get_rotating_facts_html():
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap');
+        body { margin: 0; padding: 0; background: transparent; overflow: hidden; font-family: 'DM Sans', sans-serif; }
+        .fact-box {
+            background: rgba(201,168,76,0.15); 
+            border-left: 4px solid #F0C96A; 
+            padding: 15px 20px; 
+            border-radius: 8px; 
+            box-sizing: border-box;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .title { color: #F0C96A; font-weight: bold; font-size: 15px; margin-bottom: 8px; }
+        .content { color: #FFFFFF; font-size: 14.5px; line-height: 1.6; transition: opacity 0.5s ease-in-out; }
+    </style>
+    </head>
+    <body>
+    <div class="fact-box">
+        <div class="title">💡 சுவாரஸ்யமான தகவல்:</div>
+        <div id="fact-text" class="content">உங்களுக்குத் தெரியுமா? திருக்குறளில் 'தமிழ்' என்ற வார்த்தை ஒரு இடத்தில்கூட இடம்பெறவில்லை!</div>
+    </div>
+    <script>
+        const facts = [
+            "உங்களுக்குத் தெரியுமா? திருக்குறளில் 'தமிழ்' என்ற வார்த்தை ஒரு இடத்தில்கூட இடம்பெறவில்லை!",
+            "உங்களுக்குத் தெரியுமா? திருக்குறள் அகரத்தில் (அ) தொடங்கி னகரத்தில் (ன்) முடிகிறது.",
+            "உங்களுக்குத் தெரியுமா? திருக்குறளில் பயன்படுத்தப்படாத ஒரே எண் 'ஒன்பது' (9).",
+            "உங்களுக்குத் தெரியுமா? திருக்குறளில் இடம்பெற்ற ஒரே பழம் 'நெருஞ்சிப்பழம்', விதை 'குன்றிமணி'.",
+            "உங்களுக்குத் தெரியுமா? திருக்குறளில் அதிகம் பயன்படுத்தப்பட்ட ஓர் எழுத்து 'னி' (1705 முறை).",
+            "உங்களுக்குத் தெரியுமா? திருக்குறள் இதுவரை உலகின் 107க்கும் மேற்பட்ட மொழிகளில் மொழிபெயர்க்கப்பட்டுள்ளது.",
+            "உங்களுக்குத் தெரியுமா? திருக்குறளில் ஒரு அதிகாரத்தில் கூட இடம்பெறாத ஒரே உயிரெழுத்து 'ஔ'.",
+            "உங்களுக்குத் தெரியுமா? திருக்குறளில் இருமுறை வரும் ஒரே அதிகாரம் 'குறிப்பறிதல்' (அதிகாரம் 71 & 110).",
+            "உங்களுக்குத் தெரியுமா? திருக்குறள் மூலத்தை முதன்முதலில் அச்சிட்டவர் தஞ்சை ஞானப்பிரகாசர் (1812).",
+            "உங்களுக்குத் தெரியுமா? திருக்குறளில் இடம்பெறும் இரண்டு மரங்கள் 'பனை' மற்றும் 'மூங்கில்'."
+        ];
+        let idx = 0;
+        const textEl = document.getElementById('fact-text');
+        setInterval(() => {
+            textEl.style.opacity = 0;
+            setTimeout(() => {
+                idx = (idx + 1) % facts.length;
+                textEl.innerText = facts[idx];
+                textEl.style.opacity = 1;
+            }, 500); // Wait for fade out
+        }, 3500); // Change fact every 3.5 seconds
+    </script>
+    </body>
+    </html>
+    """
+
+# ==========================================
 # 1. SMART API KEY ROTATION SYSTEM
 # ==========================================
 def get_ai_response(prompt_text):
@@ -475,22 +534,10 @@ elif selected_option in ["⚖️ சூழல் தீர்வு", "⚖️ AI
             st.session_state["verdict_input_val"] = "" 
             simulate_traffic_control(lang)
             
-            # --- திருக்குறள் ஃபேக்ட்ஸ் லோடிங் ஸ்க்ரீன் ---
-            thirukkural_facts = [
-                "உங்களுக்குத் தெரியுமா? திருக்குறளில் 'தமிழ்' என்ற வார்த்தை ஒரு இடத்தில்கூட இடம்பெறவில்லை!",
-                "உங்களுக்குத் தெரியுமா? திருக்குறள் அகரத்தில் (அ) தொடங்கி னகரத்தில் (ன்) முடிகிறது.",
-                "உங்களுக்குத் தெரியுமா? திருக்குறளில் பயன்படுத்தப்படாத ஒரே எண் 'ஒன்பது' (9).",
-                "உங்களுக்குத் தெரியுமா? திருக்குறளில் இடம்பெற்ற ஒரே பழம் 'நெருஞ்சிப்பழம்', விதை 'குன்றிமணி'.",
-                "உங்களுக்குத் தெரியுமா? திருக்குறளில் அதிகம் பயன்படுத்தப்பட்ட ஓர் எழுத்து 'னி' (1705 முறை)."
-            ]
-            selected_fact = random.choice(thirukkural_facts)
+            # --- 🌟 திருக்குறள் ஃபேக்ட்ஸ் லோடிங் அனிமேஷன் (Rotating Facts) 🌟 ---
             fact_placeholder = st.empty()
-            fact_placeholder.markdown(f"""
-            <div style="background: rgba(201,168,76,0.1); border-left: 4px solid #F0C96A; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <span style="color: #F0C96A; font-weight: bold;">💡 சுவாரஸ்யமான தகவல்:</span><br>
-                <span style="color: #FFFFFF; font-size: 14px;">{selected_fact}</span>
-            </div>
-            """, unsafe_allow_html=True)
+            with fact_placeholder:
+                components.html(get_rotating_facts_html(), height=120)
 
             with st.spinner("📜 Analyzing your situation..."):
                 try:
@@ -530,7 +577,7 @@ Format: {{"verdict": "சூழலுக்கான உங்களின் �
                         res = None
                     
                     if res:
-                        # Facts-ஐ மறைத்துவிட்டு பதிலை காட்ட
+                        # 🌟 AI பதில் வந்தவுடன் Rotating Facts-ஐ மறைத்துவிடலாம் 🌟
                         fact_placeholder.empty()
 
                         log_to_gsheets("Decision Mode", user_input, res.get('verdict', ''))
@@ -656,22 +703,10 @@ elif selected_option in ["🤖 AI வள்ளுவர்", "🤖 AI Mentor"]:
         prompt_val = st.session_state.messages[-1]["content"]
         with st.chat_message("assistant"):
             
-            # --- திருக்குறள் ஃபேக்ட்ஸ் லோடிங் ஸ்க்ரீன் ---
-            thirukkural_facts = [
-                "உங்களுக்குத் தெரியுமா? திருக்குறளில் 'தமிழ்' என்ற வார்த்தை ஒரு இடத்தில்கூட இடம்பெறவில்லை!",
-                "உங்களுக்குத் தெரியுமா? திருக்குறள் அகரத்தில் (அ) தொடங்கி னகரத்தில் (ன்) முடிகிறது.",
-                "உங்களுக்குத் தெரியுமா? திருக்குறளில் பயன்படுத்தப்படாத ஒரே எண் 'ஒன்பது' (9).",
-                "உங்களுக்குத் தெரியுமா? திருக்குறளில் இடம்பெற்ற ஒரே பழம் 'நெருஞ்சிப்பழம்', விதை 'குன்றிமணி'.",
-                "உங்களுக்குத் தெரியுமா? திருக்குறளில் அதிகம் பயன்படுத்தப்பட்ட ஓர் எழுத்து 'னி' (1705 முறை)."
-            ]
-            selected_fact = random.choice(thirukkural_facts)
+            # --- 🌟 திருக்குறள் ஃபேக்ட்ஸ் லோடிங் அனிமேஷன் (Rotating Facts) 🌟 ---
             fact_placeholder = st.empty()
-            fact_placeholder.markdown(f"""
-            <div style="background: rgba(201,168,76,0.1); border-left: 4px solid #F0C96A; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <span style="color: #F0C96A; font-weight: bold;">💡 சுவாரஸ்யமான தகவல்:</span><br>
-                <span style="color: #FFFFFF; font-size: 14px;">{selected_fact}</span>
-            </div>
-            """, unsafe_allow_html=True)
+            with fact_placeholder:
+                components.html(get_rotating_facts_html(), height=120)
 
             with st.spinner("📜 வள்ளுவர் is thinking..."):
                 try:
@@ -700,7 +735,7 @@ Format: { "verdict": "சூழலுக்கான உங்களின் �
                         r = None
                     
                     if r:
-                        # Facts-ஐ மறைத்துவிட்டு பதிலை காட்ட
+                        # 🌟 AI பதில் வந்தவுடன் Rotating Facts-ஐ மறைத்துவிடலாம் 🌟
                         fact_placeholder.empty()
 
                         log_to_gsheets("Chat Mode", prompt_val, r.get('verdict', ''))
