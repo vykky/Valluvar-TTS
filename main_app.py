@@ -31,13 +31,11 @@ st.set_page_config(
 )
 
 # ==========================================
-# 🔊 AI VOICE GENERATOR (EDGE TTS + GOOGLE TTS FALLBACK)
+# 🔊 MICROSOFT EDGE TTS (VALLUVAR NEURAL VOICE)
 # ==========================================
 def generate_edge_tts_audio(text_to_read, lang_code, unique_id):
     try:
-        if not text_to_read or not text_to_read.strip():
-            return ""
-
+        # Ingathan voice change pandrom: ValluvarNeural (Male) for Tamil, ChristopherNeural (Male) for English
         voice = 'ta-IN-ValluvarNeural' if lang_code == "தமிழ்" else 'en-US-ChristopherNeural'
         
         async def amain():
@@ -49,33 +47,17 @@ def generate_edge_tts_audio(text_to_read, lang_code, unique_id):
             
         temp_audio_path = asyncio.run(amain())
         
-        if os.path.exists(temp_audio_path) and os.path.getsize(temp_audio_path) > 0:
-            with open(temp_audio_path, "rb") as audio_file:
-                audio_bytes = audio_file.read()
-            os.remove(temp_audio_path)
-        else:
-            raise Exception("Edge TTS returned empty audio.")
+        with open(temp_audio_path, "rb") as audio_file:
+            audio_bytes = audio_file.read()
             
-    except Exception as edge_error:
-        # Edge TTS வேலை செய்யவில்லை என்றால், ஆட்டோமேட்டிக்காக Google TTS-க்கு மாறும் (Fallback)
-        try:
-            tts_lang = 'ta' if lang_code == "தமிழ்" else 'en'
-            tts = gTTS(text=text_to_read, lang=tts_lang, slow=False)
-            
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
-                temp_audio_path = fp.name
-            tts.save(temp_audio_path)
-            
-            with open(temp_audio_path, "rb") as audio_file:
-                audio_bytes = audio_file.read()
-            os.remove(temp_audio_path)
-        except Exception as backup_error:
-            return f"<p style='color:#FF8A80; font-size:12px;'>Audio generation failed.</p>"
-
-    # ஆடியோவை Base64 ஆக மாற்றி HTML-ல் கொடுப்பது (Autoplay சேர்க்கப்பட்டுள்ளது)
-    b64 = base64.b64encode(audio_bytes).decode()
-    audio_html = f'<audio id="{unique_id}" controls autoplay style="width: 100%; height: 40px; margin-top: 15px; border-radius: 8px; outline: none;"><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>'
-    return audio_html
+        b64 = base64.b64encode(audio_bytes).decode()
+        
+        audio_html = f'<audio id="{unique_id}" controls style="width: 100%; height: 40px; margin-top: 15px; border-radius: 8px; outline: none;"><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>'
+        
+        os.remove(temp_audio_path)
+        return audio_html
+    except Exception as e:
+        return f"<p style='color:#FF8A80; font-size:12px;'>Audio generation error: {e}</p>"
 
 # ==========================================
 # 💾 DATA LOGGING SYSTEM (GOOGLE SHEETS)
