@@ -416,8 +416,8 @@ def get_kural_from_local(kural_no, lang_mode):
                     eng_exp = k.get('explanation', k.get('eng_exp', k.get('Explanation', '')))
                     return {"line1": eng_line, "line2": "", "meaning": eng_exp, "number": k_no}
                 else:
-                    exp_keys = ['mv', 'tamil_exp', 'vilakkam', 'sp', 'mk']
-                    tam_exp = next((k[key] for key in exp_keys if key in k), 'விளக்கம் இல்லை')
+                    exp_keys = ['mk', 'tamil_exp', 'vilakkam']
+                    tam_exp = next((k[key] for key in exp_keys if k.get(key)), 'விளக்கம் இல்லை')
                     return {"line1": l1, "line2": l2, "meaning": tam_exp, "number": k_no}
     except Exception as e:
         pass
@@ -425,7 +425,7 @@ def get_kural_from_local(kural_no, lang_mode):
     if lang_mode == "English":
         return {"line1": "'A' leads letters; the Ancient Lord Leads and lords the entire world", "line2": "", "meaning": "As the letter A is the first of all letters, so the eternal God is first in the world", "number": 1}
     else:
-        return {"line1": "அகர முதல எழுத்தெல்லாம் ஆதி", "line2": "பகவன் முதற்றே உலகு.", "meaning": "எழுத்துக்கள் எல்லாம் அகரத்தை அடிப்படையாக கொண்டிருக்கின்றன. அதுபோல உலகம் கடவுளை அடிப்படையாக கொண்டிருக்கிறது.", "number": 1}
+        return {"line1": "அகர முதல எழுத்தெல்லாம் ஆதி", "line2": "பகவன் முதற்றே உலகு.", "meaning": "அகரம் எழுத்துக்களுக்கு முதன்மை; ஆதிபகவன், உலகில் வாழும் உயிர்களுக்கு முதன்மை", "number": 1}
 
 def simulate_traffic_control(lang):
     loading_container = st.empty()
@@ -473,8 +473,8 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
                     k_mean = item.get('explanation', item.get('eng_exp', 'No explanation available.'))
                 else:
                     k_line1, k_line2 = format_strict_venba(item.get('Line1', item.get('line1', '')), item.get('Line2', item.get('line2', '')))
-                    exp_keys = ['mv', 'tamil_exp', 'vilakkam', 'sp', 'mk']
-                    k_mean = next((item[key] for key in exp_keys if key in item), 'விளக்கம் இல்லை')
+                  exp_keys = ['mk', 'tamil_exp', 'vilakkam']
+                    k_mean = next((item[key] for key in exp_keys if item.get(key)), 'விளக்கம் இல்லை')
 
                 kural_line2_html = f'<div class="kural-line2">{k_line2}</div>' if k_line2 else ''
                 kno = item.get('Number', item.get('number', item.get('KuralNo', '')))
