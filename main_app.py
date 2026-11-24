@@ -451,8 +451,154 @@ else:
 selected_option = st.radio("", menu_options, horizontal=True)
 
 # ==================================================
-# 1. KURAL SEARCH
+# 1. KURAL SEARCH (DARK BANNER + ADHIGAARAM FIX)
 # ==================================================
+ADHIGAARAMS = [
+    ("கடவுள் வாழ்த்து", "The Praise of God"),
+    ("வான்சிறப்பு", "The Blessing of Rain"),
+    ("நீத்தார் பெருமை", "The Greatness of Ascetics"),
+    ("அறன் வலியுறுத்தல்", "Assertion of the Strength of Virtue"),
+    ("இல்வாழ்க்கை", "Domestic Life"),
+    ("வாழ்க்கைத் துணைநலம்", "The Worth of a Wife"),
+    ("மக்கட்பேறு", "The Wealth of Children"),
+    ("அன்புடைமை", "The Possession of Love"),
+    ("விருந்தோம்பல்", "Hospitality"),
+    ("இனியவை கூறல்", "The Utterance of Pleasant Words"),
+    ("செய்ந்நன்றி அறிதல்", "Gratitude"),
+    ("நடுவு நிலைமை", "Impartiality"),
+    ("அடக்கம் உடைமை", "The Possession of Self-restraint"),
+    ("ஒழுக்கம் உடைமை", "The Possession of Decorum"),
+    ("பிறனில் விழையாமை", "Not Coveting Others Spouse"),
+    ("பொறையுடைமை", "The Possession of Patience"),
+    ("அழுக்காறாமை", "Not Envying"),
+    ("வெஃகாமை", "Not Coveting"),
+    ("புறங்கூறாமை", "Not Backbiting"),
+    ("பயனில சொல்லாமை", "Against Vain Speaking"),
+    ("தீவினையச்சம்", "Dread of Evil Deeds"),
+    ("ஒப்புரவறிதல்", "Duty to Society"),
+    ("ஈகை", "Giving"),
+    ("புகழ்", "Renown"),
+    ("அருளுடைமை", "The Possession of Benevolence"),
+    ("புலால் மறுத்தல்", "Abstinence from Flesh"),
+    ("தவம்", "Penance"),
+    ("கூடாவொழுக்கம்", "Imposture"),
+    ("கள்ளாமை", "The Absence of Fraud"),
+    ("வாய்மை", "Veracity"),
+    ("வெகுளாமை", "Restraining Anger"),
+    ("இன்னாசெய்யாமை", "Not Doing Evil"),
+    ("கொல்லாமை", "Not Killing"),
+    ("நிலையாமை", "Instability"),
+    ("துறவு", "Renunciation"),
+    ("மெய்யுணர்தல்", "Truth-Consciousness"),
+    ("அவாவறுத்தல்", "Curbing of Desire"),
+    ("ஊழ்", "Fate"),
+    ("இறைமாட்சி", "The Greatness of a King"),
+    ("கல்வி", "Learning"),
+    ("கல்லாமை", "Ignorance"),
+    ("கேள்வி", "Hearing"),
+    ("அறிவுடைமை", "The Possession of Knowledge"),
+    ("குற்றங்கடிதல்", "The Correction of Faults"),
+    ("பெரியாரைத் துணைக்கோடல்", "Seeking the Aid of Great Men"),
+    ("சிற்றினம் சேராமை", "Avoiding Mean Associations"),
+    ("தெரிந்து செயல்வகை", "Acting after Due Consideration"),
+    ("வலியறிதல்", "The Knowledge of Power"),
+    ("காலமறிதல்", "Knowing the Fitting Time"),
+    ("இடனறிதல்", "Knowing the Place"),
+    ("தெரிந்து தெளிதல்", "Selection and Confidence"),
+    ("தெரிந்து வினையாடல்", "Selection and Employment"),
+    ("சுற்றந்தழால்", "Cherishing Kindred"),
+    ("பொச்சாவாமை", "Unforgetfulness"),
+    ("செங்கோன்மை", "The Right Sceptre"),
+    ("கொடுங்கோன்மை", "The Cruel Sceptre"),
+    ("வெருவந்த செய்யாமை", "Absence of Terrorism"),
+    ("கண்ணோட்டம்", "Benignity"),
+    ("ஒற்றாடல்", "Espionage"),
+    ("ஊக்கமுடைமை", "Energy"),
+    ("மடியின்மை", "Unsluggishness"),
+    ("ஆள்வினையுடைமை", "Manly Effort"),
+    ("இடுக்கண் அழியாமை", "Hopefulness in Trouble"),
+    ("அமைச்சு", "The Office of Minister"),
+    ("சொல்வன்மை", "Power in Speech"),
+    ("வினைத்தூய்மை", "Purity in Action"),
+    ("வினைத்திட்பம்", "Power in Action"),
+    ("வினைசெயல்வகை", "The Mode of Action"),
+    ("தூது", "The Envoy"),
+    ("மன்னரைச் சேர்ந்தொழுகல்", "Conduct in Presence of King"),
+    ("குறிப்பறிதல்", "Knowledge of Indications"),
+    ("அவையறிதல்", "Knowledge of Council Chamber"),
+    ("அவையஞ்சாமை", "Not to Dread the Council"),
+    ("நாடு", "The Land"),
+    ("அரண்", "The Fortification"),
+    ("பொருள்செயல்வகை", "Way of Accumulating Wealth"),
+    ("படைமாட்சி", "The Excellence of an Army"),
+    ("படைச்செருக்கு", "Military Spirit"),
+    ("நட்பு", "Friendship"),
+    ("நட்பாராய்தல்", "Investigation in Forming Friendships"),
+    ("பழைமை", "Familiarity"),
+    ("தீ நட்பு", "Evil Friendship"),
+    ("கூடாநட்பு", "Unreal Friendship"),
+    ("பேதைமை", "Folly"),
+    ("புல்லறிவாண்மை", "Petty Conceit"),
+    ("இகல்", "Hostility"),
+    ("பகைமாட்சி", "The Might of Hatred"),
+    ("பகைத்திறந்தெரிதல்", "Knowing the Quality of Hate"),
+    ("உட்பகை", "Enmity Within"),
+    ("பெரியாரைப் பிழையாமை", "Not Offending the Great"),
+    ("பெண்வழிச்சேறல்", "Being Led by Women"),
+    ("வரைவின்மகளிர்", "Wanton Women"),
+    ("கள்ளுண்ணாமை", "Not Drinking Liquor"),
+    ("சூது", "Gambling"),
+    ("மருந்து", "Medicine"),
+    ("குடிமை", "Nobility"),
+    ("மானம்", "Honour"),
+    ("பெருமை", "Greatness"),
+    ("சான்றாண்மை", "Perfectness"),
+    ("பண்புடைமை", "Courtesy"),
+    ("நன்றியில் செல்வம்", "Wealth Without Benefaction"),
+    ("நாணுடைமை", "Modesty"),
+    ("குடிசெயல்வகை", "Maintaining the Family"),
+    ("உழவு", "Farming"),
+    ("நல்குரவு", "Poverty"),
+    ("இரவு", "Mendicancy"),
+    ("இரவச்சம்", "Dread of Mendicancy"),
+    ("கயமை", "Baseness"),
+    ("தகையணங்குறுத்தல்", "Mental Disturbance Caused by Beauty"),
+    ("குறிப்பறிதல்", "Recognition of the Signs"),
+    ("புணர்ச்சி மகிழ்தல்", "Rejoicing in the Embrace"),
+    ("நலம்புனைந்துரைத்தல்", "Praise of Her Beauty"),
+    ("காதற்சிறப்புரைத்தல்", "Excellence of Love"),
+    ("நாணுத்துறவுரைத்தல்", "Abandonment of Reserve"),
+    ("அலரறிவுறுத்தல்", "Announcement of Rumour"),
+    ("பிரிவாற்றாமை", "Separation Unendurable"),
+    ("படர்மெலிந்திரங்கல்", "Complainings"),
+    ("கண்விதுப்பழிதல்", "Eyes Consumed with Grief"),
+    ("பசப்புறுபருவரல்", "The Pallid Hue"),
+    ("தனிப்படர்மிகுதி", "Solitary Anguish"),
+    ("நினைந்தவர்புலம்பல்", "Sad Memories"),
+    ("கனவுநிலையுரைத்தல்", "Visions of the Night"),
+    ("பொழுதுகண்டிரங்கல்", "Lamentations at Eventide"),
+    ("உறுப்புநலனழிதல்", "Wasting Away"),
+    ("நெஞ்சொடுகிளத்தல்", "Soliloquy"),
+    ("நிறையழிதல்", "Reserve Overcome"),
+    ("அவர்வயின்விதும்பல்", "Mutual Desire"),
+    ("குறிப்பறிவுறுத்தல்", "Reading of the Signs"),
+    ("புணர்ச்சிவிதும்பல்", "Desire for Reunion"),
+    ("நெஞ்சொடுபுலத்தல்", "Expostulation with Oneself"),
+    ("புலவி", "Pouting"),
+    ("புலவி நுணுக்கம்", "Feigned Anger"),
+    ("ஊடலுவகை", "Pleasures of Temporary Variance")
+]
+
+def get_adhigaaram_info(kural_no, lang_mode):
+    try:
+        chap_no = (int(kural_no) - 1) // 10 + 1
+        if 1 <= chap_no <= 133:
+            ta_name, en_name = ADHIGAARAMS[chap_no - 1]
+            return chap_no, (en_name if lang_mode == "English" else ta_name)
+    except Exception:
+        pass
+    return "", ""
+
 if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Search"]:
     if "search_limit" not in st.session_state: st.session_state.search_limit = 10
     search_term = st.text_input("தேட வேண்டிய சொல் / Search Keyword:", placeholder=placeholder_text)
@@ -460,10 +606,21 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
     if st.button(btn_search): st.session_state.search_limit = 10 
 
     if kurals_list and search_term:
-        results = [k for k in kurals_list if search_term.lower() in str(k).lower()]
+        term = search_term.strip().lower()
+        results = []
+        for k in kurals_list:
+            kno_val = k.get('Number', k.get('number', k.get('KuralNo', '')))
+            c_no, c_name = get_adhigaaram_info(kno_val, lang)
+            if term in str(k).lower() or term in c_name.lower():
+                results.append(k)
+
         if results:
             total_results = len(results)
-            st.success(f"✅ Found {total_results} results / {total_results} குறள்கள் கிடைத்தன:")
+            st.markdown(f"""
+<div style="background: rgba(25, 135, 84, 0.22); border: 1.5px solid #4CAF50; border-left: 5px solid #4CAF50; border-radius: 12px; padding: 14px 18px; margin: 12px 0 20px 0; color: #FFFFFF !important; font-weight: 700; font-size: 15px;">
+✅ Found {total_results} results &nbsp;|&nbsp; {total_results} குறள்கள் கிடைத்தன
+</div>
+""", unsafe_allow_html=True)
             for item in results[:st.session_state.search_limit]:
                 venba_class = "venba-eng" if lang == "English" else "venba-tamil"
                 
@@ -478,10 +635,12 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
 
                 kural_line2_html = f'<div class="kural-line2">{k_line2}</div>' if k_line2 else ''
                 kno = item.get('Number', item.get('number', item.get('KuralNo', '')))
+                chap_no, chap_name = get_adhigaaram_info(kno, lang)
+                chap_badge = f"📖 Chapter {chap_no}: {chap_name} &nbsp;|&nbsp; " if (lang == "English" and chap_no) else (f"📖 அதிகாரம் {chap_no}: {chap_name} &nbsp;|&nbsp; " if chap_no else "")
 
                 st.markdown(f"""
 <div class="result-card">
-<div class="result-adhigaaram">{lbl_kno} {kno}</div>
+<div class="result-adhigaaram">{chap_badge}{lbl_kno} {kno}</div>
 <div class="kural-block">
 <div class="{venba_class}">
 <div class="kural-line1">{k_line1}</div>
@@ -498,7 +657,12 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
                     st.session_state.search_limit += 10
                     st.rerun() 
         else:
-            if search_term: st.warning("No related Kural found. / தொடர்புடைய குறள் எதுவும் இல்லை.")
+            if search_term:
+                st.markdown("""
+<div style="background: rgba(240, 201, 106, 0.15); border: 1.5px solid #F0C96A; border-left: 5px solid #F0C96A; border-radius: 12px; padding: 14px 18px; margin: 12px 0; color: #F0C96A !important; font-weight: 700; font-size: 15px;">
+⚠️ No related Kural found. / தொடர்புடைய குறள் எதுவும் இல்லை.
+</div>
+""", unsafe_allow_html=True)
 
 # ==================================================
 # 2. VERDICT 
