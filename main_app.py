@@ -473,7 +473,7 @@ if selected_option in ["🔍 குறள் தேடல்", "🔍 Kural Searc
                     k_mean = item.get('explanation', item.get('eng_exp', 'No explanation available.'))
                 else:
                     k_line1, k_line2 = format_strict_venba(item.get('Line1', item.get('line1', '')), item.get('Line2', item.get('line2', '')))
-                  exp_keys = ['mk', 'tamil_exp', 'vilakkam']
+                    exp_keys = ['mk', 'tamil_exp', 'vilakkam']
                     k_mean = next((item[key] for key in exp_keys if item.get(key)), 'விளக்கம் இல்லை')
 
                 kural_line2_html = f'<div class="kural-line2">{k_line2}</div>' if k_line2 else ''
